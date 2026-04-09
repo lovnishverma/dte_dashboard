@@ -7,6 +7,8 @@ A comprehensive, full-featured Flask-based analytical dashboard designed for the
 
 ---
 
+<img width="1910" height="962" alt="image" src="https://github.com/user-attachments/assets/4c9a6b22-f98f-4022-aef7-03c96a98b970" />
+
 ## ✨ Key Features
 
 * **📊 Comprehensive Analytics:** Real-time KPI cards, batch overview strips, and multi-dimensional mini-charts (gender/batch/branch splits).
@@ -32,7 +34,7 @@ A comprehensive, full-featured Flask-based analytical dashboard designed for the
 
 **1. Clone the repository:**
 ```bash
-git clone [https://github.com/your-repo/dte_dashboard.git](https://github.com/your-repo/dte_dashboard.git)
+git clone https://github.com/lovnishverma/dte_dashboard.git
 cd dte_dashboard
 ```
 
