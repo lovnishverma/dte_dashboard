@@ -1,3 +1,13 @@
+---
+license: mit
+title: DTE Punjab — Training Dashboard v2
+sdk: docker
+colorFrom: yellow
+short_description: A full-featured Flask dashboard for the BDDS, DTE, NIELIT.
+---
+
+
+
 # 🎓 DTE Punjab — Training Dashboard v2
 
 A comprehensive, full-featured Flask-based analytical dashboard designed for the Big Data & Data Science Training Programme conducted for the Department of Technical Education and Industrial Training (DTE), Government of Punjab.
