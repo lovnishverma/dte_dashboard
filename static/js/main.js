@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    DTE Punjab Dashboard — main.js  (v2)
    Vanilla JS: API calls, Chart.js charts, clickable bubble map, modal,
-   insights panel, CSV export, participant detail modal.
+   insights panel, CSV export, participant detail modal, image gallery.
 ═══════════════════════════════════════════════════════════════════════ */
 "use strict";
 
@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSidebar();
   initNavigation();
   initModal();
+  initLightbox();
   fetchAll();
 });
 
@@ -961,7 +962,44 @@ window.openParticipantModal = function (idx) {
 };
 
 /* ══════════════════════════════════════════════════════════════════════
-   15. EXPORT CSV
+   15. LIGHTBOX GALLERY
+══════════════════════════════════════════════════════════════════════ */
+function initLightbox() {
+  const lbModal = document.getElementById("lightboxModal");
+  const lbClose = document.getElementById("lightboxClose");
+  
+  if (lbClose) lbClose.onclick = closeLightbox;
+  if (lbModal) {
+    lbModal.onclick = function (e) {
+      if (e.target === this) closeLightbox();
+    };
+  }
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeLightbox();
+  });
+}
+
+window.openLightbox = function(src, caption) {
+  const modal = document.getElementById("lightboxModal");
+  const img = document.getElementById("lightboxImage");
+  const cap = document.getElementById("lightboxCaption");
+  
+  img.src = src;
+  cap.textContent = caption;
+  modal.style.display = "flex";
+};
+
+function closeLightbox() {
+  const modal = document.getElementById("lightboxModal");
+  const img = document.getElementById("lightboxImage");
+  if (modal) {
+    modal.style.display = "none";
+    img.src = ""; // Clear src to stop previous image flashing next time
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   16. EXPORT CSV
 ══════════════════════════════════════════════════════════════════════ */
 function initExportButtons() {
   // Full export (top bar)
