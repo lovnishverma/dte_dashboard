@@ -33,7 +33,7 @@
       <span class="nav-icon">💡</span><span class="nav-label">Insights</span>
     </a>
     <a href="#map"       class="nav-item" data-section="map">
-      <span class="nav-icon">🗺️</span><span class="nav-label">District Map</span>
+      <span class="nav-icon">🗺️</span><span class="nav-label">Colleges Map</span>
     </a>
     <a href="#table"     class="nav-item" data-section="table">
       <span class="nav-icon">📋</span><span class="nav-label">Participants</span>
@@ -218,7 +218,7 @@
         </div>
         <div class="chart-card chart-wide">
           <div class="chart-header">
-            <h3>Top 10 Colleges by Participants</h3>
+            <h3>Top Colleges by Participants</h3>
             <span class="chart-badge">Horizontal Bar</span>
           </div>
           <div class="chart-wrap" style="height:340px">
@@ -245,7 +245,7 @@
     <!-- ── Map ───────────────────────────────────────────────────── -->
     <section id="map" class="section">
       <div class="section-header">
-        <h2 class="section-title">District Map</h2>
+        <h2 class="section-title">Colleges Map</h2>
         <span class="section-badge">Punjab, India · Click bubble to open in Google Maps</span>
       </div>
       <div class="map-container">
@@ -258,12 +258,13 @@
         <div id="googleMap" class="google-map" style="display:none;"></div>
       </div>
 
-      <!-- District details panel (shown on click) -->
-      <div id="districtPanel" class="district-panel" style="display:none">
+      <!-- College details panel (shown on click) -->
+      <div id="collegePanel" class="district-panel" style="display:none">
         <div class="dp-header">
           <div>
             <span class="dp-name" id="dpName">–</span>
             <span class="dp-count" id="dpCount">–</span>
+            <div id="dpDistrict" style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"></div>
           </div>
           <div class="dp-actions">
             <button class="dp-gmaps-btn" id="dpGmapsBtn">📍 Open in Google Maps</button>
@@ -274,10 +275,7 @@
           <div class="dp-stat-row">
             <div class="dp-stat" id="dpMale">–</div>
             <div class="dp-stat" id="dpFemale">–</div>
-            <div class="dp-stat" id="dpColleges">–</div>
           </div>
-          <div class="dp-section-title">Colleges</div>
-          <div class="dp-colleges" id="dpCollegeList">–</div>
         </div>
       </div>
 

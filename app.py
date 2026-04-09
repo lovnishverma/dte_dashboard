@@ -18,6 +18,94 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "data", "DTE_all_Batch.xlsx"
 GMAP_KEY  = os.getenv("GOOGLE_MAPS_API_KEY", "")
 
 
+# ── Coordinates & Normalisation Maps ──────────────────────────────────────────
+
+DISTRICT_COORDS = {
+    "Amritsar":                  (31.6340, 74.8723),
+    "Ludhiana":                  (30.9010, 75.8573),
+    "Patiala":                   (30.3398, 76.3869),
+    "Jalandhar":                 (31.3260, 75.5762),
+    "Bathinda":                  (30.2110, 74.9455),
+    "Rupnagar":                  (30.9686, 76.5253),
+    "Mohali":                    (30.7046, 76.7179),
+    "SAS Nagar Mohali":          (30.7046, 76.7179),
+    "Hoshiarpur":                (31.5347, 75.9114),
+    "Moga":                      (30.8171, 75.1683),
+    "Gurdaspur":                 (32.0398, 75.4058),
+    "Ferozepur":                 (30.9233, 74.6150),
+    "Tarn Taran":                (31.4519, 74.9282),
+    "Faridkot":                  (30.6645, 74.7550),
+    "Barnala":                   (30.3776, 75.5483),
+    "Mansa":                     (29.9877, 75.3974),
+    "Fatehgarh sahib":           (30.6492, 76.3903),
+    "Shaheed Bhagat Singh Nagar":(31.1285, 76.1148),
+}
+
+COLLEGE_MAP = {
+    "Government Polytechnic College, Bhikhiwind": "GPC Bhikhiwind",
+    "Government Polytechnic College Guru Teg Bahadur Garh (Moga)": "GPC GTB Garh Moga",
+    "Government Polytechnic College, Dinanagar": "GPC Dinanagar",
+    "Government. Polytecnic College Jalandhar": "GPC Jalandhar",
+    "Government Polytechnic College,Jalandhar": "GPC Jalandhar",
+    "Government Polytechnic College, Jalandhar": "GPC Jalandhar",
+    "Sant Baba Attar Singh Government. Polytechnic College , Badbar": "SBAS GPC Badbar",
+    "Sant Baba Attar Singh Government. Polytechnic College, Badbar": "SBAS GPC Badbar",
+    "Government. Polytecnic College , Amritsar": "GPC Amritsar",
+    "Government Polytechnic College, Amritsar": "GPC Amritsar",
+    "Mai Bhago Government Polytechnic College For Girls, Amritsar": "Mai Bhago GPC Amritsar",
+    "Government Polytechnic College for Girls,Amritsar": "Mai Bhago GPC Amritsar",
+    "Government. Polytechnic College, Bathinda": "GPC Bathinda",
+    "Government Polytechnic College, Bathinda": "GPC Bathinda",
+    "Government Polytechnic College Khunimajra": "GPC Khunimajra",
+    "Government.Polytechnic College, Khunimajra": "GPC Khunimajra",
+    "Government polytechnic khunimajra": "GPC Khunimajra",
+    "Government Polytechnic College, Khunimajra": "GPC Khunimajra",
+    "S. R. S. Government Polytechnic College Ludhiana": "SRS GPC Ludhiana",
+    "Government Polytechnic College, Ludhiana": "SRS GPC Ludhiana",
+    "SRS Government Polytechnic College, Ludhiana": "SRS GPC Ludhiana",
+    "Government Polytechnic College Ferozpur": "GPC Ferozepur",
+    "Government Polytechnic College Ferozepur": "GPC Ferozepur",
+    "Government Polytechnic College,Ferozepur": "GPC Ferozepur",
+    "Government Polytechnic College, Ropar": "GPC Rupnagar",
+    "Government Polytechnic College, Rupnagar": "GPC Rupnagar",
+    "Government Polytechnic College, Patiala": "GPC Patiala",
+    "Government. Polytechnic College, Patiala": "GPC Patiala",
+    "Government Polytechnic College, Bareta": "GPC Bareta",
+    "Shaheed Nand Singh Government. Polytechnic College, Bareta": "GPC Bareta",
+    "Shaheed Nand Singh Government Polytechnic College Bareta": "GPC Bareta",
+    "Government Polytechnic College Kotkapura": "GPC Kotkapura",
+    "Government Polytechnic College, Kotkapura": "GPC Kotkapura",
+    "Pt. J. R. Government. Polytechnic College Hoshiarpur": "Pt. JR GPC Hoshiarpur",
+    "Pt. J.R. Government Polytechnic College, Hoshairpur": "Pt. JR GPC Hoshiarpur",
+    "S. Amarjit Singh Sahi Government Polytechnic College, Talwara": "SASS GPC Talwara",
+    "SASS Government Polytechnic College, Talwara": "SASS GPC Talwara",
+    "Government Polytechnic College, Behram": "GPC Behram",
+    "Shri Guru Hargobind Sahib Government Polytechnic College Ranwan": "SGHS GPC Ranwan"
+}
+
+COLLEGE_COORDS = {
+    "GPC Bhikhiwind": (31.3283, 74.7001),
+    "GPC GTB Garh Moga": (30.8229, 75.1742),
+    "GPC Dinanagar": (32.1384, 75.4667),
+    "GPC Jalandhar": (31.3200, 75.6000),
+    "SBAS GPC Badbar": (30.3444, 75.6263),
+    "GPC Amritsar": (31.6366, 74.8745),
+    "Mai Bhago GPC Amritsar": (31.6212, 74.8872),
+    "GPC Bathinda": (30.2223, 74.9542),
+    "GPC Khunimajra": (30.7303, 76.6669),
+    "SRS GPC Ludhiana": (30.9022, 75.8341),
+    "GPC Ferozepur": (30.9329, 74.6210),
+    "GPC Rupnagar": (30.9634, 76.5312),
+    "GPC Patiala": (30.3294, 76.3860),
+    "GPC Bareta": (29.8711, 75.7118),
+    "GPC Kotkapura": (30.5843, 74.8252),
+    "Pt. JR GPC Hoshiarpur": (31.5369, 75.9224),
+    "SASS GPC Talwara": (31.9546, 75.8715),
+    "GPC Behram": (31.1118, 76.0123),
+    "SGHS GPC Ranwan": (30.6480, 76.3821)
+}
+
+
 # ── Data Loading ──────────────────────────────────────────────────────────────
 
 def load_data() -> pd.DataFrame:
@@ -55,6 +143,9 @@ def load_data() -> pd.DataFrame:
         if col in df.columns:
             df[col] = df[col].astype(str).str.strip().replace("nan", "N/A")
 
+    if "college" in df.columns:
+        df["college"] = df["college"].map(COLLEGE_MAP).fillna(df["college"])
+
     if "designation" in df.columns:
         df["designation"] = df["designation"].str.upper()
         df["designation"] = df["designation"].str.replace(r'\s+', ' ', regex=True).str.strip()
@@ -75,30 +166,6 @@ def load_data() -> pd.DataFrame:
         df["branch"] = df["branch"].str.lower().map(branch_map).fillna(df["branch"])
 
     return df
-
-
-# ── District Coordinates ──────────────────────────────────────────────────────
-
-DISTRICT_COORDS = {
-    "Amritsar":                  (31.6340, 74.8723),
-    "Ludhiana":                  (30.9010, 75.8573),
-    "Patiala":                   (30.3398, 76.3869),
-    "Jalandhar":                 (31.3260, 75.5762),
-    "Bathinda":                  (30.2110, 74.9455),
-    "Rupnagar":                  (30.9686, 76.5253),
-    "Mohali":                    (30.7046, 76.7179),
-    "SAS Nagar Mohali":          (30.7046, 76.7179),
-    "Hoshiarpur":                (31.5347, 75.9114),
-    "Moga":                      (30.8171, 75.1683),
-    "Gurdaspur":                 (32.0398, 75.4058),
-    "Ferozepur":                 (30.9233, 74.6150),
-    "Tarn Taran":                (31.4519, 74.9282),
-    "Faridkot":                  (30.6645, 74.7550),
-    "Barnala":                   (30.3776, 75.5483),
-    "Mansa":                     (29.9877, 75.3974),
-    "Fatehgarh sahib":           (30.6492, 76.3903),
-    "Shaheed Bhagat Singh Nagar":(31.1285, 76.1148),
-}
 
 
 # ── API Endpoints ─────────────────────────────────────────────────────────────
@@ -150,9 +217,10 @@ def summary():
 @app.route("/api/map-data")
 def map_data():
     df = load_data()
-    grouped = df.groupby("district").agg(
+    # Grouping by normalized college name to render bubbles over actual colleges
+    grouped = df.groupby("college").agg(
         count=("name", "count"),
-        colleges=("college", lambda x: list(x.unique())),
+        district=("district", "first"),
         names=("name", list),
         designations=("designation", lambda x: x.value_counts().to_dict()),
         genders=("gender", lambda x: x.value_counts().to_dict()),
@@ -160,14 +228,19 @@ def map_data():
 
     features = []
     for _, row in grouped.iterrows():
-        coords = DISTRICT_COORDS.get(row["district"])
+        college_name = row["college"]
+        coords = COLLEGE_COORDS.get(college_name)
+        # Fallback to district bounds if not mapped
+        if not coords:
+            coords = DISTRICT_COORDS.get(row["district"])
+
         if coords:
             features.append({
+                "college":      college_name,
                 "district":     row["district"],
                 "count":        int(row["count"]),
                 "lat":          coords[0],
                 "lng":          coords[1],
-                "colleges":     row["colleges"],
                 "sample":       row["names"][:5],
                 "designations": row["designations"],
                 "genders":      row["genders"],

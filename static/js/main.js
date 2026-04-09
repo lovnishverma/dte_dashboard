@@ -6,19 +6,19 @@
 "use strict";
 
 /* ── Global state ─────────────────────────────────────────────────────── */
-let allRows     = [];
+let allRows = [];
 let summaryData = {};
-let mapData     = {};
-let advStats    = {};
+let mapData = {};
+let advStats = {};
 
 let tableFiltered = [];
-let sortCol       = "sno";
-let sortDir       = "asc";
-const PAGE_SIZE   = 20;
-let currentPage   = 1;
+let sortCol = "sno";
+let sortDir = "asc";
+const PAGE_SIZE = 20;
+let currentPage = 1;
 
-let selectedDistrict = null;  // For map panel
-let mapBubbles       = [];    // [{feature, x, y, r}] for hit-testing
+let selectedCollege = null;  // For map panel
+let mapBubbles = [];    // [{feature, x, y, r}] for hit-testing
 
 const charts = {};
 
@@ -38,8 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
 ══════════════════════════════════════════════════════════════════════ */
 function initTheme() {
   const toggle = document.getElementById("themeToggle");
-  const html   = document.documentElement;
-  const saved  = localStorage.getItem("dte-theme");
+  const html = document.documentElement;
+  const saved = localStorage.getItem("dte-theme");
   if (saved) {
     html.setAttribute("data-theme", saved);
     toggle.querySelector(".theme-icon").textContent = saved === "dark" ? "🌙" : "☀️";
@@ -109,10 +109,10 @@ async function fetchAll() {
       fetchJSON("/api/stats/advanced"),
     ]);
 
-    allRows     = rows;
+    allRows = rows;
     summaryData = summary;
-    mapData     = map;
-    advStats    = adv;
+    mapData = map;
+    advStats = adv;
 
     renderKPIs(summary);
     renderBatchStrip(summary);
@@ -147,20 +147,20 @@ async function fetchJSON(url) {
    6. KPI CARDS
 ══════════════════════════════════════════════════════════════════════ */
 function renderKPIs(s) {
-  countUp("kpi-total",     s.total_participants, 0,  1200);
-  countUp("kpi-colleges",  s.total_colleges,     0,  900);
-  countUp("kpi-districts", s.total_districts,    0,  700);
-  countUp("kpi-female",    s.female_pct,         1,  1000);
+  countUp("kpi-total", s.total_participants, 0, 1200);
+  countUp("kpi-colleges", s.total_colleges, 0, 900);
+  countUp("kpi-districts", s.total_districts, 0, 700);
+  countUp("kpi-female", s.female_pct, 1, 1000);
 }
 
 function countUp(id, target, decimals, duration) {
-  const el   = document.getElementById(id);
+  const el = document.getElementById(id);
   if (!el) return;
   const start = performance.now();
   function step(now) {
     const progress = Math.min((now - start) / duration, 1);
     const ease = 1 - Math.pow(1 - progress, 3);
-    const val  = (target * ease).toFixed(decimals);
+    const val = (target * ease).toFixed(decimals);
     el.childNodes[0].textContent = val;
     if (progress < 1) requestAnimationFrame(step);
   }
@@ -171,11 +171,11 @@ function countUp(id, target, decimals, duration) {
    7. BATCH STRIP
 ══════════════════════════════════════════════════════════════════════ */
 function renderBatchStrip(s) {
-  const bc   = s.batch_counts || {};
+  const bc = s.batch_counts || {};
   const keys = Object.keys(bc);
   const find = n => keys.find(k => k.startsWith(`Batch ${n}`));
   const b = n => document.querySelector(`#batch-${n} .batch-count`);
-  [1,2,3].forEach(n => { const el = b(n); if (el) el.textContent = bc[find(n)] ?? "–"; });
+  [1, 2, 3].forEach(n => { const el = b(n); if (el) el.textContent = bc[find(n)] ?? "–"; });
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -185,11 +185,11 @@ function renderInsights(s, adv) {
   const grid = document.getElementById("insightsGrid");
   if (!grid) return;
 
-  const total       = s.total_participants;
-  const femalePct   = s.female_pct;
-  const malePct     = (100 - femalePct).toFixed(1);
-  const seniorPct   = s.senior_pct;
-  const topDistPct  = adv.top_district_count ? Math.round(adv.top_district_count / total * 100) : 0;
+  const total = s.total_participants;
+  const femalePct = s.female_pct;
+  const malePct = (100 - femalePct).toFixed(1);
+  const seniorPct = s.senior_pct;
+  const topDistPct = adv.top_district_count ? Math.round(adv.top_district_count / total * 100) : 0;
 
   const cards = [
     {
@@ -271,21 +271,21 @@ function cssVar(name) {
 }
 
 const PALETTE = [
-  "#4f8ef7","#a78bfa","#2dd4bf","#fb7185",
-  "#fbbf24","#34d399","#f87171","#60a5fa",
-  "#c084fc","#4ade80","#f472b6","#818cf8",
+  "#4f8ef7", "#a78bfa", "#2dd4bf", "#fb7185",
+  "#fbbf24", "#34d399", "#f87171", "#60a5fa",
+  "#c084fc", "#4ade80", "#f472b6", "#818cf8",
 ];
 
 function buildCharts() {
   const s = summaryData;
   if (!s.district_counts) return;
 
-  Chart.defaults.color       = cssVar("--text-muted");
+  Chart.defaults.color = cssVar("--text-muted");
   Chart.defaults.borderColor = cssVar("--chart-grid");
   Chart.defaults.font.family = "'Inter', sans-serif";
 
   // District bar
-  const distLabels = Object.keys(s.district_counts).sort((a,b) => s.district_counts[b] - s.district_counts[a]);
+  const distLabels = Object.keys(s.district_counts).sort((a, b) => s.district_counts[b] - s.district_counts[a]);
   const distValues = distLabels.map(k => s.district_counts[k]);
   buildChart("districtChart", {
     type: "bar",
@@ -294,22 +294,24 @@ function buildCharts() {
       datasets: [{
         label: "Participants",
         data: distValues,
-        backgroundColor: distLabels.map((_,i) => PALETTE[i % PALETTE.length] + "cc"),
-        borderColor: distLabels.map((_,i) => PALETTE[i % PALETTE.length]),
+        backgroundColor: distLabels.map((_, i) => PALETTE[i % PALETTE.length] + "cc"),
+        borderColor: distLabels.map((_, i) => PALETTE[i % PALETTE.length]),
         borderWidth: 1, borderRadius: 6,
       }],
     },
     options: barOptions("Participants"),
   });
 
-  // Gender doughnut (full analytics page)
+  // Gender doughnut
   buildChart("genderChart", {
     type: "doughnut",
     data: {
       labels: Object.keys(s.gender_counts),
-      datasets: [{ data: Object.values(s.gender_counts),
-        backgroundColor: ["#fb718599","#4f8ef799"],
-        borderColor: ["#fb7185","#4f8ef7"], borderWidth: 2, hoverOffset: 8 }],
+      datasets: [{
+        data: Object.values(s.gender_counts),
+        backgroundColor: ["#fb718599", "#4f8ef799"],
+        borderColor: ["#fb7185", "#4f8ef7"], borderWidth: 2, hoverOffset: 8
+      }],
     },
     options: doughnutOptions(),
   });
@@ -319,35 +321,46 @@ function buildCharts() {
     type: "doughnut",
     data: {
       labels: Object.keys(s.branch_counts),
-      datasets: [{ data: Object.values(s.branch_counts),
-        backgroundColor: ["#4f8ef799","#a78bfa99","#2dd4bf99","#fbbf2499"],
-        borderColor: ["#4f8ef7","#a78bfa","#2dd4bf","#fbbf24"],
-        borderWidth: 2, hoverOffset: 8 }],
+      datasets: [{
+        data: Object.values(s.branch_counts),
+        backgroundColor: ["#4f8ef799", "#a78bfa99", "#2dd4bf99", "#fbbf2499"],
+        borderColor: ["#4f8ef7", "#a78bfa", "#2dd4bf", "#fbbf24"],
+        borderWidth: 2, hoverOffset: 8
+      }],
     },
     options: doughnutOptions(),
   });
 
-  // Designation bar
+  // Designation bar (Horizontal Fix)
+  const desigLabels = Object.keys(s.designation_counts);
+  const desigValues = desigLabels.map(k => s.designation_counts[k]);
   buildChart("designationChart", {
     type: "bar",
     data: {
-      labels: Object.keys(s.designation_counts),
+      labels: desigLabels,
       datasets: [{
         label: "Count",
-        data: Object.values(s.designation_counts),
-        backgroundColor: PALETTE.slice(0, Object.keys(s.designation_counts).length).map(c => c + "cc"),
-        borderColor: PALETTE.slice(0, Object.keys(s.designation_counts).length),
+        data: desigValues,
+        backgroundColor: desigLabels.map((_, i) => PALETTE[i % PALETTE.length] + "cc"),
+        borderColor: desigLabels.map((_, i) => PALETTE[i % PALETTE.length]),
         borderWidth: 1, borderRadius: 6,
       }],
     },
-    options: { ...barOptions("Count"), indexAxis: "y" },
+    options: barOptions("Count", true),
   });
 
   // Batch-gender grouped bar
   if (s.batch_gender) {
     const batches = Object.keys(s.batch_gender).sort();
-    const genders = ["Male","Female"];
+    const genders = ["Male", "Female"];
     const gColors = { Male: "#4f8ef7", Female: "#fb7185" };
+
+    const bgOptions = barOptions("Count");
+    bgOptions.plugins.legend = {
+      display: true, position: "top",
+      labels: { color: cssVar("--text-muted"), font: { size: 11 }, padding: 14, boxWidth: 12 }
+    };
+
     buildChart("batchGenderChart", {
       type: "bar",
       data: {
@@ -360,20 +373,14 @@ function buildCharts() {
           borderWidth: 1, borderRadius: 4,
         })),
       },
-      options: {
-        ...barOptions("Count"),
-        plugins: {
-          legend: { display: true, position: "top",
-            labels: { color: cssVar("--text-muted"), font: { size: 11 }, padding: 14, boxWidth: 12 } },
-        },
-      },
+      options: bgOptions,
     });
   }
 
-  // Top colleges
+  // Top colleges (Horizontal Fix)
   if (s.top_colleges) {
     const colLabels = Object.keys(s.top_colleges);
-    const colValues = Object.values(s.top_colleges);
+    const colValues = colLabels.map(k => s.top_colleges[k]);
     buildChart("collegeChart", {
       type: "bar",
       data: {
@@ -381,12 +388,12 @@ function buildCharts() {
         datasets: [{
           label: "Participants",
           data: colValues,
-          backgroundColor: PALETTE.map(c => c + "cc"),
-          borderColor: PALETTE,
+          backgroundColor: colLabels.map((_, i) => PALETTE[i % PALETTE.length] + "cc"),
+          borderColor: colLabels.map((_, i) => PALETTE[i % PALETTE.length]),
           borderWidth: 1, borderRadius: 4,
         }],
       },
-      options: { ...barOptions("Count"), indexAxis: "y" },
+      options: barOptions("Count", true),
     });
   }
 
@@ -395,13 +402,16 @@ function buildCharts() {
     type: "doughnut",
     data: {
       labels: Object.keys(s.gender_counts),
-      datasets: [{ data: Object.values(s.gender_counts),
-        backgroundColor: ["#fb718599","#4f8ef799"],
-        borderColor: ["#fb7185","#4f8ef7"], borderWidth: 2, hoverOffset: 6 }],
+      datasets: [{
+        data: Object.values(s.gender_counts),
+        backgroundColor: ["#fb718599", "#4f8ef799"],
+        borderColor: ["#fb7185", "#4f8ef7"], borderWidth: 2, hoverOffset: 6
+      }],
     },
     options: doughnutOptions(),
   });
 
+  const bOptions = barOptions("");
   buildChart("overviewBatchChart", {
     type: "bar",
     data: {
@@ -409,22 +419,24 @@ function buildCharts() {
       datasets: [{
         label: "Participants",
         data: Object.values(s.batch_counts),
-        backgroundColor: ["#4f8ef799","#a78bfa99","#2dd4bf99"],
-        borderColor: ["#4f8ef7","#a78bfa","#2dd4bf"],
+        backgroundColor: ["#4f8ef799", "#a78bfa99", "#2dd4bf99"],
+        borderColor: ["#4f8ef7", "#a78bfa", "#2dd4bf"],
         borderWidth: 1, borderRadius: 6,
       }],
     },
-    options: { ...barOptions(""), plugins: { legend: { display: false } } },
+    options: bOptions,
   });
 
   buildChart("overviewBranchChart", {
     type: "doughnut",
     data: {
       labels: Object.keys(s.branch_counts),
-      datasets: [{ data: Object.values(s.branch_counts),
-        backgroundColor: ["#4f8ef799","#a78bfa99","#2dd4bf99","#fbbf2499"],
-        borderColor: ["#4f8ef7","#a78bfa","#2dd4bf","#fbbf24"],
-        borderWidth: 2, hoverOffset: 6 }],
+      datasets: [{
+        data: Object.values(s.branch_counts),
+        backgroundColor: ["#4f8ef799", "#a78bfa99", "#2dd4bf99", "#fbbf2499"],
+        borderColor: ["#4f8ef7", "#a78bfa", "#2dd4bf", "#fbbf24"],
+        borderWidth: 2, hoverOffset: 6
+      }],
     },
     options: doughnutOptions(),
   });
@@ -437,29 +449,41 @@ function buildChart(id, config) {
   charts[id] = new Chart(ctx, config);
 }
 
-function barOptions(yLabel) {
-  return {
+function barOptions(valueLabel, isHorizontal = false) {
+  const options = {
     responsive: true, maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: {
-        label: ctx => ` ${ctx.parsed.y ?? ctx.parsed.x} participants`,
-      }},
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed[isHorizontal ? 'x' : 'y']} participants`,
+        }
+      },
     },
     scales: {
       x: { grid: { color: cssVar("--chart-grid") }, ticks: { color: cssVar("--text-muted"), font: { size: 11 } } },
-      y: { grid: { color: cssVar("--chart-grid") }, ticks: { color: cssVar("--text-muted"), font: { size: 11 } },
-           title: { display: !!yLabel, text: yLabel, color: cssVar("--text-muted"), font: { size: 11 } } },
+      y: { grid: { color: cssVar("--chart-grid") }, ticks: { color: cssVar("--text-muted"), font: { size: 11 } } },
     },
   };
+
+  if (isHorizontal) {
+    options.indexAxis = 'y';
+    options.scales.x.title = { display: !!valueLabel, text: valueLabel, color: cssVar("--text-muted"), font: { size: 11 } };
+  } else {
+    options.scales.y.title = { display: !!valueLabel, text: valueLabel, color: cssVar("--text-muted"), font: { size: 11 } };
+  }
+
+  return options;
 }
 
 function doughnutOptions() {
   return {
     responsive: true, maintainAspectRatio: false, cutout: "65%",
     plugins: {
-      legend: { position: "bottom",
-        labels: { color: cssVar("--text-muted"), font: { size: 11 }, padding: 14, boxWidth: 12 } },
+      legend: {
+        position: "bottom",
+        labels: { color: cssVar("--text-muted"), font: { size: 11 }, padding: 14, boxWidth: 12 }
+      },
       tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } },
     },
   };
@@ -475,9 +499,9 @@ function renderBubbleMap(features) {
   if (!canvas || !features || !features.length) return;
 
   const dpr = window.devicePixelRatio || 1;
-  const W   = canvas.offsetWidth  || 900;
-  const H   = canvas.offsetHeight || 500;
-  canvas.width  = W * dpr;
+  const W = canvas.offsetWidth || 900;
+  const H = canvas.offsetHeight || 500;
+  canvas.width = W * dpr;
   canvas.height = H * dpr;
   const ctx = canvas.getContext("2d");
   ctx.scale(dpr, dpr);
@@ -511,7 +535,7 @@ function renderBubbleMap(features) {
   features.forEach(f => {
     const [x, y] = toXY(f.lat, f.lng);
     const r = 12 + (f.count / maxCount) * 36;
-    const isSelected = selectedDistrict === f.district;
+    const isSelected = selectedCollege === f.college;
 
     // Glow
     const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 1.6);
@@ -525,11 +549,11 @@ function renderBubbleMap(features) {
     if (isSelected) {
       grad.addColorStop(0, "#67e8f9");
       grad.addColorStop(.6, "#06b6d4");
-      grad.addColorStop(1,  "#0e7490");
+      grad.addColorStop(1, "#0e7490");
     } else {
       grad.addColorStop(0, "#6aafff");
       grad.addColorStop(.6, "#2563eb");
-      grad.addColorStop(1,  "#1e40af");
+      grad.addColorStop(1, "#1e40af");
     }
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fillStyle = grad;
@@ -553,7 +577,7 @@ function renderBubbleMap(features) {
     ctx.fillStyle = isDark ? "#c8d6ef" : "#1a1d2e";
     ctx.font = `${isSelected ? "bold " : ""}11px Inter, sans-serif`;
     ctx.textBaseline = "top";
-    ctx.fillText(f.district, x, y + r + 5);
+    ctx.fillText(f.college, x, y + r + 5);
 
     mapBubbles.push({ feature: f, x, y, r });
   });
@@ -563,7 +587,7 @@ function renderBubbleMap(features) {
   ctx.font = "bold 13px Inter, sans-serif";
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillText("Punjab — Participant Distribution by District  (click bubble to view details & open in Google Maps)", 14, 10);
+  ctx.fillText("Punjab — Participant Distribution by College  (click bubble to view details & open in Google Maps)", 14, 10);
 
   // Attach click handler (once)
   canvas.onclick = null;
@@ -583,13 +607,13 @@ function renderBubbleMap(features) {
     }
 
     if (hit) {
-      selectedDistrict = hit.feature.district;
+      selectedCollege = hit.feature.college;
       renderBubbleMap(features);
-      showDistrictPanel(hit.feature);
+      showCollegePanel(hit.feature);
     } else {
-      selectedDistrict = null;
+      selectedCollege = null;
       renderBubbleMap(features);
-      document.getElementById("districtPanel").style.display = "none";
+      document.getElementById("collegePanel").style.display = "none";
     }
   };
 
@@ -600,45 +624,44 @@ function renderBubbleMap(features) {
     const my = (e.clientY - rect.top);
     const isOver = mapBubbles.some(b => {
       const dx = mx - b.x, dy = my - b.y;
-      return Math.sqrt(dx*dx + dy*dy) <= b.r + 4;
+      return Math.sqrt(dx * dx + dy * dy) <= b.r + 4;
     });
     canvas.style.cursor = isOver ? "pointer" : "default";
   };
 }
 
-function showDistrictPanel(f) {
-  const panel = document.getElementById("districtPanel");
+function showCollegePanel(f) {
+  const panel = document.getElementById("collegePanel");
   panel.style.display = "block";
-  document.getElementById("dpName").textContent  = f.district;
+  document.getElementById("dpName").textContent = f.college;
   document.getElementById("dpCount").textContent = `${f.count} participants`;
 
-  const males   = f.genders?.Male   ?? 0;
+  const dpDistrict = document.getElementById("dpDistrict");
+  if (dpDistrict) dpDistrict.textContent = `District: ${f.district || 'Unknown'}`;
+
+  const males = f.genders?.Male ?? 0;
   const females = f.genders?.Female ?? 0;
 
-  document.getElementById("dpMale").innerHTML   = `<strong>${males}</strong>Male`;
+  document.getElementById("dpMale").innerHTML = `<strong>${males}</strong>Male`;
   document.getElementById("dpFemale").innerHTML = `<strong>${females}</strong>Female`;
-  document.getElementById("dpColleges").innerHTML = `<strong>${f.colleges?.length ?? 0}</strong>Colleges`;
-
-  const collegeList = document.getElementById("dpCollegeList");
-  collegeList.innerHTML = (f.colleges || []).map(c =>
-    `<span class="dp-college-tag">${c}</span>`).join("");
 
   // Google Maps button
   const gmBtn = document.getElementById("dpGmapsBtn");
-  gmBtn.onclick = () => openGoogleMaps(f.lat, f.lng, f.district);
+  gmBtn.onclick = () => openGoogleMaps(f.lat, f.lng, f.college, f.district);
 
   // Close button
   document.getElementById("dpCloseBtn").onclick = () => {
     panel.style.display = "none";
-    selectedDistrict = null;
+    selectedCollege = null;
     renderBubbleMap(mapData.features);
   };
 
   panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
-function openGoogleMaps(lat, lng, name) {
-  const url = `https://www.google.com/maps/search/${encodeURIComponent(name + " Punjab India")}/@${lat},${lng},12z`;
+function openGoogleMaps(lat, lng, name, district) {
+  const query = `${name}, ${district || ''}, Punjab India`.replace(/, ,/g, ',');
+  const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat},${lng},14z`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
@@ -649,24 +672,27 @@ function renderMapLegend(features) {
   if (!features) return;
   const grid = document.getElementById("mapLegendGrid");
   if (!grid) return;
-  const sorted = [...features].sort((a,b) => b.count - a.count);
+  const sorted = [...features].sort((a, b) => b.count - a.count);
   grid.innerHTML = sorted.map(f => `
-    <div class="map-legend-item" data-district="${f.district}"
-         onclick="legendClickDistrict('${f.district}', ${f.lat}, ${f.lng})">
-      <span class="map-legend-district">${f.district}</span>
+    <div class="map-legend-item" data-college="${f.college}"
+         onclick="legendClickCollege('${f.college}', ${f.lat}, ${f.lng})">
+      <div style="display:flex; flex-direction:column; max-width:80%;">
+        <span class="map-legend-district" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${f.college}</span>
+        <span style="font-size:0.65rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${f.district}</span>
+      </div>
       <span class="map-legend-count">${f.count}</span>
     </div>`).join("");
 }
 
-window.legendClickDistrict = function(district, lat, lng) {
+window.legendClickCollege = function (college, lat, lng) {
   // Switch to map section, highlight, and open Google Maps
   showSection("map");
   setTimeout(() => {
-    const feat = mapData.features?.find(f => f.district === district);
+    const feat = mapData.features?.find(f => f.college === college);
     if (feat) {
-      selectedDistrict = district;
+      selectedCollege = college;
       renderBubbleMap(mapData.features);
-      showDistrictPanel(feat);
+      showCollegePanel(feat);
     }
   }, 80);
 };
@@ -679,7 +705,7 @@ function loadGoogleMaps(key, features) {
   window.gm_authFailure = () => { authFailed = true; showCanvasFallback(features); };
 
   const script = document.createElement("script");
-  script.src   = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&libraries=marker&v=weekly&callback=initGoogleMap`;
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&libraries=marker&v=weekly&callback=initGoogleMap`;
   script.async = true;
   script.defer = true;
   script.onerror = () => { authFailed = true; showCanvasFallback(features); };
@@ -687,14 +713,14 @@ function loadGoogleMaps(key, features) {
 
   window.initGoogleMap = async () => {
     if (authFailed) return;
-    const mapDiv  = document.getElementById("googleMap");
-    const fallback= document.getElementById("mapFallback");
+    const mapDiv = document.getElementById("googleMap");
+    const fallback = document.getElementById("mapFallback");
     if (!mapDiv) return;
     try {
       const { Map, InfoWindow } = await google.maps.importLibrary("maps");
       const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
       if (authFailed) return;
-      mapDiv.style.display   = "block";
+      mapDiv.style.display = "block";
       fallback.style.display = "none";
 
       const map = new Map(mapDiv, { center: { lat: 31.1, lng: 75.3 }, zoom: 8, mapId: "DEMO_MAP_ID" });
@@ -706,28 +732,24 @@ function loadGoogleMaps(key, features) {
         const pin = new PinElement({
           glyphText: String(f.count),
           glyphColor: "#ffffff",
-          background: `hsl(${220 - (f.count/maxCount)*40}, 85%, ${45 + (f.count/maxCount)*10}%)`,
+          background: `hsl(${220 - (f.count / maxCount) * 40}, 85%, ${45 + (f.count / maxCount) * 10}%)`,
           borderColor: "#93c5fd",
           scale,
         });
         const marker = new AdvancedMarkerElement({
           position: { lat: f.lat, lng: f.lng },
-          map, title: `${f.district} - ${f.count} participants`,
+          map, title: `${f.college} - ${f.count} participants`,
           content: pin,
         });
         const infoContent = `
           <div style="font-family:Inter,sans-serif;padding:12px;min-width:200px;max-width:280px">
-            <strong style="font-size:15px;color:#1e293b">${f.district}</strong>
-            <div style="color:#6b7280;font-size:12px;margin:2px 0 10px">${f.count} participants</div>
+            <strong style="font-size:14px;color:#1e293b">${f.college}</strong>
+            <div style="color:#6b7280;font-size:12px;margin:2px 0 10px">${f.district} &bull; ${f.count} participants</div>
             <div style="display:flex;gap:12px;margin-bottom:10px;font-size:12px;color:#374151">
               <span>👨 ${f.genders?.Male ?? 0} Male</span>
               <span>👩 ${f.genders?.Female ?? 0} Female</span>
             </div>
-            <div style="font-size:11px;color:#374151;line-height:1.7">
-              ${f.colleges.slice(0,4).map(c => `• ${c}`).join("<br>")}
-              ${f.colleges.length > 4 ? `<em style="color:#9ca3af">+${f.colleges.length - 4} more</em>` : ""}
-            </div>
-            <a href="https://www.google.com/maps/search/${encodeURIComponent(f.district+' Punjab India')}/@${f.lat},${f.lng},12z"
+            <a href="https://www.google.com/maps/search/${encodeURIComponent(f.college + ', ' + f.district + ' Punjab India')}/@${f.lat},${f.lng},14z"
                target="_blank" rel="noopener"
                style="display:block;margin-top:10px;background:#2563eb;color:#fff;text-align:center;
                       padding:6px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none">
@@ -748,9 +770,9 @@ function loadGoogleMaps(key, features) {
 }
 
 function showCanvasFallback(features) {
-  const mapDiv   = document.getElementById("googleMap");
+  const mapDiv = document.getElementById("googleMap");
   const fallback = document.getElementById("mapFallback");
-  if (mapDiv)   mapDiv.style.display   = "none";
+  if (mapDiv) mapDiv.style.display = "none";
   if (fallback) fallback.style.display = "block";
   if (features) renderBubbleMap(features);
 }
@@ -760,21 +782,21 @@ function showCanvasFallback(features) {
 ══════════════════════════════════════════════════════════════════════ */
 function buildTable() {
   if (!allRows.length) return;
-  populateFilter("filterBatch",       [...new Set(allRows.map(r=>r.batch).filter(Boolean))].sort());
-  populateFilter("filterDesignation", [...new Set(allRows.map(r=>r.designation).filter(Boolean))].sort());
-  populateFilter("filterDistrict",    [...new Set(allRows.map(r=>r.district).filter(Boolean))].sort());
+  populateFilter("filterBatch", [...new Set(allRows.map(r => r.batch).filter(Boolean))].sort());
+  populateFilter("filterDesignation", [...new Set(allRows.map(r => r.designation).filter(Boolean))].sort());
+  populateFilter("filterDistrict", [...new Set(allRows.map(r => r.district).filter(Boolean))].sort());
 
-  document.getElementById("tableSearch")       .addEventListener("input",  applyFilters);
-  document.getElementById("filterBatch")       .addEventListener("change", applyFilters);
-  document.getElementById("filterDesignation") .addEventListener("change", applyFilters);
-  document.getElementById("filterDistrict")    .addEventListener("change", applyFilters);
+  document.getElementById("tableSearch").addEventListener("input", applyFilters);
+  document.getElementById("filterBatch").addEventListener("change", applyFilters);
+  document.getElementById("filterDesignation").addEventListener("change", applyFilters);
+  document.getElementById("filterDistrict").addEventListener("change", applyFilters);
 
   document.querySelectorAll("#participantsTable th.sortable").forEach(th => {
     th.addEventListener("click", () => {
       const col = th.dataset.col;
       sortDir = sortCol === col ? (sortDir === "asc" ? "desc" : "asc") : "asc";
       sortCol = col;
-      document.querySelectorAll("#participantsTable th").forEach(h => h.classList.remove("sort-asc","sort-desc"));
+      document.querySelectorAll("#participantsTable th").forEach(h => h.classList.remove("sort-asc", "sort-desc"));
       th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
       applyFilters();
     });
@@ -793,25 +815,25 @@ function populateFilter(id, values) {
 }
 
 function applyFilters() {
-  const q        = document.getElementById("tableSearch").value.toLowerCase();
-  const batch    = document.getElementById("filterBatch").value;
-  const desig    = document.getElementById("filterDesignation").value;
+  const q = document.getElementById("tableSearch").value.toLowerCase();
+  const batch = document.getElementById("filterBatch").value;
+  const desig = document.getElementById("filterDesignation").value;
   const district = document.getElementById("filterDistrict").value;
 
   tableFiltered = allRows.filter(r => {
     const hay = `${r.name} ${r.college} ${r.district} ${r.designation} ${r.branch}`.toLowerCase();
     return (!q || hay.includes(q)) &&
-           (!batch    || r.batch       === batch)    &&
-           (!desig    || r.designation === desig)    &&
-           (!district || r.district    === district);
+      (!batch || r.batch === batch) &&
+      (!desig || r.designation === desig) &&
+      (!district || r.district === district);
   });
 
   tableFiltered.sort((a, b) => {
     let va = a[sortCol] ?? "", vb = b[sortCol] ?? "";
     if (sortCol === "sno") { va = +va; vb = +vb; }
     else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
-    return va < vb ? (sortDir === "asc" ? -1 :  1) :
-           va > vb ? (sortDir === "asc" ?  1 : -1) : 0;
+    return va < vb ? (sortDir === "asc" ? -1 : 1) :
+      va > vb ? (sortDir === "asc" ? 1 : -1) : 0;
   });
 
   currentPage = 1;
@@ -822,9 +844,9 @@ function applyFilters() {
 
 function renderTablePage() {
   const tbody = document.getElementById("tableBody");
-  const slice = tableFiltered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  const slice = tableFiltered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   tbody.innerHTML = slice.map((r, i) => `
-    <tr class="row-link" onclick="openParticipantModal(${(currentPage-1)*PAGE_SIZE + i})">
+    <tr class="row-link" onclick="openParticipantModal(${(currentPage - 1) * PAGE_SIZE + i})">
       <td>${r.sno ?? ""}</td>
       <td><strong>${r.name ?? "—"}</strong></td>
       <td>${genderPill(r.gender)}</td>
@@ -840,30 +862,30 @@ function renderTablePage() {
 }
 
 function genderPill(g) {
-  if (!g || g==="N/A") return g ?? "—";
-  return `<span class="pill ${g==="Female"?"pill-female":"pill-male"}">${g}</span>`;
+  if (!g || g === "N/A") return g ?? "—";
+  return `<span class="pill ${g === "Female" ? "pill-female" : "pill-male"}">${g}</span>`;
 }
 
 function designBadge(d) {
-  if (!d || d==="N/A") return d ?? "—";
-  const m = { "HOD":"badge-hod","Senior Lecturer":"badge-senior","Lecturer":"badge-lect" };
-  return `<span class="badge ${m[d]||"badge-other"}">${d}</span>`;
+  if (!d || d === "N/A") return d ?? "—";
+  const m = { "HOD": "badge-hod", "Senior Lecturer": "badge-senior", "Lecturer": "badge-lect" };
+  return `<span class="badge ${m[d] || "badge-other"}">${d}</span>`;
 }
 
 function renderPagination() {
   const total = Math.ceil(tableFiltered.length / PAGE_SIZE);
-  const pag   = document.getElementById("pagination");
+  const pag = document.getElementById("pagination");
   if (!pag) return;
   // Show max 10 page buttons around current page
   const range = [];
   const delta = 4;
-  for (let i = Math.max(1, currentPage-delta); i <= Math.min(total, currentPage+delta); i++) {
+  for (let i = Math.max(1, currentPage - delta); i <= Math.min(total, currentPage + delta); i++) {
     range.push(i);
   }
   let html = "";
-  if (range[0] > 1) html += `<button class="page-btn" data-page="1">1</button>${range[0]>2?'<span style="color:var(--text-muted);padding:4px">…</span>':""}`;
-  range.forEach(i => { html += `<button class="page-btn${i===currentPage?" active":""}" data-page="${i}">${i}</button>`; });
-  if (range[range.length-1] < total) html += `${range[range.length-1]<total-1?'<span style="color:var(--text-muted);padding:4px">…</span>':""}<button class="page-btn" data-page="${total}">${total}</button>`;
+  if (range[0] > 1) html += `<button class="page-btn" data-page="1">1</button>${range[0] > 2 ? '<span style="color:var(--text-muted);padding:4px">…</span>' : ""}`;
+  range.forEach(i => { html += `<button class="page-btn${i === currentPage ? " active" : ""}" data-page="${i}">${i}</button>`; });
+  if (range[range.length - 1] < total) html += `${range[range.length - 1] < total - 1 ? '<span style="color:var(--text-muted);padding:4px">…</span>' : ""}<button class="page-btn" data-page="${total}">${total}</button>`;
   pag.innerHTML = html;
   pag.querySelectorAll(".page-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -876,7 +898,7 @@ function renderPagination() {
 }
 
 /* ── Map action from table ───────────────────────────────────────────── */
-window.viewOnMap = function(district, college) {
+window.viewOnMap = function (district, college) {
   if (district && district !== "N/A") {
     const query = college && college !== "N/A" ? `${college}, ${district}, Punjab India` : `${district} Punjab India`;
     window.open(`https://www.google.com/maps/search/${encodeURIComponent(query)}`, "_blank", "noopener,noreferrer");
@@ -888,7 +910,7 @@ window.viewOnMap = function(district, college) {
 ══════════════════════════════════════════════════════════════════════ */
 function initModal() {
   document.getElementById("modalClose").onclick = closeModal;
-  document.getElementById("participantModal").onclick = function(e) {
+  document.getElementById("participantModal").onclick = function (e) {
     if (e.target === this) closeModal();
   };
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
@@ -898,16 +920,16 @@ function closeModal() {
   document.getElementById("participantModal").style.display = "none";
 }
 
-window.openParticipantModal = function(idx) {
+window.openParticipantModal = function (idx) {
   const r = tableFiltered[idx];
   if (!r) return;
   const modal = document.getElementById("participantModal");
   modal.style.display = "flex";
 
-  const initials = (r.name || "?").split(" ").slice(0,2).map(w => w[0]).join("").toUpperCase();
+  const initials = (r.name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
   document.getElementById("modalAvatar").textContent = initials;
-  document.getElementById("modalName").textContent   = r.name ?? "—";
-  document.getElementById("modalDesig").textContent  = r.designation ?? "—";
+  document.getElementById("modalName").textContent = r.name ?? "—";
+  document.getElementById("modalDesig").textContent = r.designation ?? "—";
 
   const tags = [
     genderPill(r.gender),
@@ -917,12 +939,12 @@ window.openParticipantModal = function(idx) {
   document.getElementById("modalTags").innerHTML = tags.join("");
 
   const fields = [
-    { label: "Branch",   value: r.branch   ?? "—" },
+    { label: "Branch", value: r.branch ?? "—" },
     { label: "District", value: r.district ?? "—" },
-    { label: "College",  value: r.college  ?? "—" },
-    { label: "Mobile",   value: r.mobile && r.mobile !== "N/A" ? r.mobile : "—" },
-    { label: "Email",    value: r.email   && r.email  !== "N/A" ? r.email  : "—" },
-    { label: "Sr. No",   value: r.sno     ?? "—" },
+    { label: "College", value: r.college ?? "—" },
+    { label: "Mobile", value: r.mobile && r.mobile !== "N/A" ? r.mobile : "—" },
+    { label: "Email", value: r.email && r.email !== "N/A" ? r.email : "—" },
+    { label: "Sr. No", value: r.sno ?? "—" },
   ];
   document.getElementById("modalGrid").innerHTML = fields.map(f => `
     <div class="modal-field">
@@ -947,10 +969,10 @@ function initExportButtons() {
 
   // Filtered export (table toolbar)
   document.getElementById("exportTableBtn").onclick = () => {
-    const batch    = document.getElementById("filterBatch").value;
-    const desig    = document.getElementById("filterDesignation").value;
+    const batch = document.getElementById("filterBatch").value;
+    const desig = document.getElementById("filterDesignation").value;
     const district = document.getElementById("filterDistrict").value;
-    const q        = document.getElementById("tableSearch").value;
+    const q = document.getElementById("tableSearch").value;
     if (!q && !batch && !desig && !district) {
       window.location.href = "/api/export";
       return;
@@ -961,15 +983,15 @@ function initExportButtons() {
 }
 
 function downloadCSV(rows, filename) {
-  const cols = ["sno","name","gender","designation","branch","college","district","email","mobile","batch"];
+  const cols = ["sno", "name", "gender", "designation", "branch", "college", "district", "email", "mobile", "batch"];
   const header = cols.join(",");
   const body = rows.map(r =>
     cols.map(c => `"${String(r[c] ?? "").replace(/"/g, '""')}"`).join(",")
   );
   const csv = [header, ...body].join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
   a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
