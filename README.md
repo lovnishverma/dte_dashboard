@@ -45,4 +45,5 @@ dte_dashboard/
 └── static/
     ├── css/style.css
     └── js/main.js
+    └── images/batch_images...n.jpg
 ```
