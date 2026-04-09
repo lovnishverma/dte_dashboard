@@ -18,7 +18,7 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "data", "DTE_all_Batch.xlsx"
 GMAP_KEY  = os.getenv("GOOGLE_MAPS_API_KEY", "")
 
 
-# ── Coordinates & Normalisation Maps ──────────────────────────────────────────
+# Coordinates & Normalisation Maps
 
 DISTRICT_COORDS = {
     "Amritsar":                  (31.6340, 74.8723),
@@ -106,7 +106,7 @@ COLLEGE_COORDS = {
 }
 
 
-# ── Data Loading ──────────────────────────────────────────────────────────────
+# Data Loading
 
 def load_data() -> pd.DataFrame:
     raw = pd.read_excel(DATA_FILE, sheet_name=0, header=None)
@@ -168,7 +168,7 @@ def load_data() -> pd.DataFrame:
     return df
 
 
-# ── API Endpoints ─────────────────────────────────────────────────────────────
+# API Endpoints
 
 @app.route("/api/dashboard-data")
 def dashboard_data():
@@ -316,7 +316,7 @@ def advanced_stats():
     })
 
 
-# ── Pages ──────────────────────────────────────────────────────────────────────
+# Pages
 
 @app.route("/")
 def index():
