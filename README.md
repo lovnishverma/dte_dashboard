@@ -2,6 +2,11 @@
 
 A full-featured Flask dashboard for the Big Data & Data Science training programme.
 
+
+## Live Demo: 
+
+https://princelv-dte.hf.space/
+
 ## Features
 
 - **Overview** — KPI cards, batch strip, 3 mini-charts (gender/batch/branch)
