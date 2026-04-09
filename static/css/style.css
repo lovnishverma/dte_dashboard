@@ -30,7 +30,7 @@
   --topbar-bg:    #1a1d27;
   --badge-bg:     #2d3251;
   --chart-grid:   rgba(255,255,255,.06);
-  --modal-bg:     rgba(0,0,0,.7);
+  --modal-bg:     rgba(0,0,0,.85);
 }
 
 [data-theme="light"] {
@@ -51,7 +51,7 @@
   --topbar-bg:    #ffffff;
   --badge-bg:     #dde6ff;
   --chart-grid:   rgba(0,0,0,.06);
-  --modal-bg:     rgba(0,0,0,.5);
+  --modal-bg:     rgba(0,0,0,.75);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -371,6 +371,48 @@ body {
   border-radius: 20px; padding: 2px 8px; font-size: .7rem; font-weight: 700;
 }
 
+/* ── Image Gallery ───────────────────────────────────────────────────── */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.gallery-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.gallery-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+.gallery-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  border-bottom: 1px solid var(--border);
+  transition: opacity var(--transition);
+}
+.gallery-card:hover img {
+  opacity: 0.9;
+}
+.gallery-caption {
+  padding: 16px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface);
+}
+
+
 /* ── Table ───────────────────────────────────────────────────────────── */
 .table-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
 .search-input, .filter-select {
@@ -445,7 +487,7 @@ body {
 .page-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
 .page-btn:disabled { opacity: .4; cursor: default; }
 
-/* ── Participant Modal ───────────────────────────────────────────────── */
+/* ── Participant Modal & Modals in General ───────────────────────────── */
 .modal-overlay {
   position: fixed; inset: 0;
   background: var(--modal-bg);
