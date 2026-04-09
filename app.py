@@ -227,27 +227,39 @@ def map_data():
     ).reset_index()
 
     features = []
+    district_counts = {}
+
     for _, row in grouped.iterrows():
         college_name = row["college"]
-        coords = COLLEGE_COORDS.get(college_name)
-        # Fallback to district bounds if not mapped
-        if not coords:
-            coords = DISTRICT_COORDS.get(row["district"])
+        district_name = row["district"]
+        
+        # Base coordinate is the district coordinate to place them visually "on the district"
+        base_coords = DISTRICT_COORDS.get(district_name)
+        if not base_coords:
+            base_coords = (31.1471, 75.3412) # Fallback center
+            
+        # Add a slight offset for multiple colleges in the same district to prevent overlapping bubbles
+        c_idx = district_counts.get(district_name, 0)
+        district_counts[district_name] = c_idx + 1
+        
+        offset_lat, offset_lng = 0, 0
+        if c_idx == 1:   offset_lat, offset_lng = 0.03, 0.03
+        elif c_idx == 2: offset_lat, offset_lng = -0.03, -0.03
+        elif c_idx == 3: offset_lat, offset_lng = 0.03, -0.03
+        elif c_idx == 4: offset_lat, offset_lng = -0.03, 0.03
 
-        if coords:
-            features.append({
-                "college":      college_name,
-                "district":     row["district"],
-                "count":        int(row["count"]),
-                "lat":          coords[0],
-                "lng":          coords[1],
-                "sample":       row["names"][:5],
-                "designations": row["designations"],
-                "genders":      row["genders"],
-            })
+        features.append({
+            "college":      college_name,
+            "district":     district_name,
+            "count":        int(row["count"]),
+            "lat":          base_coords[0] + offset_lat,
+            "lng":          base_coords[1] + offset_lng,
+            "sample":       row["names"][:5],
+            "designations": row["designations"],
+            "genders":      row["genders"],
+        })
 
     return jsonify({"features": features, "gmaps_key": GMAP_KEY})
-
 
 @app.route("/api/export")
 def export_csv():

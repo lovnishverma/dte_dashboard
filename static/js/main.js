@@ -660,8 +660,10 @@ function showCollegePanel(f) {
 }
 
 function openGoogleMaps(lat, lng, name, district) {
+  // Omit the lat/lng centering in the URL so Google Maps 
+  // searches and opens the exact Polytechnic location rather than the district center.
   const query = `${name}, ${district || ''}, Punjab India`.replace(/, ,/g, ',');
-  const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat},${lng},14z`;
+  const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
@@ -749,7 +751,7 @@ function loadGoogleMaps(key, features) {
               <span>👨 ${f.genders?.Male ?? 0} Male</span>
               <span>👩 ${f.genders?.Female ?? 0} Female</span>
             </div>
-            <a href="https://www.google.com/maps/search/${encodeURIComponent(f.college + ', ' + f.district + ' Punjab India')}/@${f.lat},${f.lng},14z"
+            <a href="https://www.google.com/maps/search/${encodeURIComponent(f.college + ', ' + f.district + ' Punjab India')}"
                target="_blank" rel="noopener"
                style="display:block;margin-top:10px;background:#2563eb;color:#fff;text-align:center;
                       padding:6px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none">
