@@ -1,54 +1,100 @@
-# DTE Punjab — Training Dashboard v2
+# 🎓 DTE Punjab — Training Dashboard v2
 
-A full-featured Flask dashboard for the Big Data & Data Science training programme.
+A comprehensive, full-featured Flask-based analytical dashboard designed for the Big Data & Data Science Training Programme conducted for the Department of Technical Education and Industrial Training (DTE), Government of Punjab.
 
+## 🌐 Live Demo
+[Experience the Dashboard Live](https://princelv-dte.hf.space/)
 
-## Live Demo: 
+---
 
-https://princelv-dte.hf.space/
+## ✨ Key Features
 
-## Features
+* **📊 Comprehensive Analytics:** Real-time KPI cards, batch overview strips, and multi-dimensional mini-charts (gender/batch/branch splits).
+* **📈 Advanced Visualizations:** Detailed district bar charts, branch/gender doughnuts, designation breakdowns, and batch-gender grouped metrics using Chart.js.
+* **💡 Smart Insights Engine:** Auto-generated analytical insight cards with animated progress bars evaluating demographic and geographic distributions.
+* **🗺️ Interactive Geospatial Mapping:** Clickable bubble map plotting participant density across Punjab districts. Features an integrated Google Maps fallback and click-to-open functionality for specific polytechnic colleges.
+* **🗄️ Dynamic Participant Data:** Searchable, filterable (by batch, designation, district), and fully sortable paginated data table.
+* **📥 Export Capabilities:** One-click CSV generation for both complete datasets and actively filtered views.
+* **🌓 Modern UI/UX:** Fully responsive, premium interface with a persistent Dark / Light mode toggle powered by vanilla CSS variables and `localStorage`.
+* **🖼️ Media Gallery:** Built-in lightbox gallery showcasing batch-wise group photographs.
 
-- **Overview** — KPI cards, batch strip, 3 mini-charts (gender/batch/branch)
-- **Analytics** — District bar, gender doughnut, branch doughnut, designation bar, batch-gender grouped bar, top-10 colleges bar
-- **Insights** — Auto-generated insight cards with animated progress bars
-- **District Map** — Clickable bubble map; click any bubble to see a district detail panel and open Google Maps. Legend items also clickable.
-- **Participants Table** — Search, filter by batch/designation/district, sort by any column, paginated. Row click opens a participant detail modal. "📍 Map" button opens the college/district in Google Maps.
-- **Export CSV** — Export all participants or current filtered view
-- **Dark / Light mode** — persisted in localStorage
+---
 
-## Bug Fixes (vs v1)
+## 🛠️ Technology Stack
 
-- `gm_authFailure` crash on AdvancedMarkerElement fixed (authFailed guard)
-- Designation normalisation edge cases resolved
-- Pagination now shows windowed page numbers (no overflow for large datasets)
-- Count-up animation now correctly targets first text node
-- Chart redraws correctly on theme toggle
-- Canvas map redraws on section re-visit
+* **Backend:** Python 3, Flask, Pandas, OpenPyXL, python-dotenv
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+), Chart.js
+* **APIs & Integrations:** Google Maps JavaScript API (Advanced Markers)
 
-## Setup
+---
 
+## ⚙️ Installation & Setup
+
+**1. Clone the repository:**
 ```bash
+git clone [https://github.com/your-repo/dte_dashboard.git](https://github.com/your-repo/dte_dashboard.git)
 cd dte_dashboard
+```
+
+**2. Create and activate a virtual environment (Recommended):**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+```
+
+**3. Install the required dependencies:**
+```bash
 pip install -r requirements.txt
+```
+
+**4. Configure Environment Variables:**
+Ensure you have a `.env` file in the root directory containing your Google Maps API key (and optionally the Flask environment):
+```env
+GOOGLE_MAPS_API_KEY=your_actual_api_key_here
+FLASK_ENV=development
+```
+
+**5. Run the application:**
+```bash
 python app.py
 ```
+*The dashboard will be available at `http://localhost:5000`*
 
-Then open http://localhost:5000
+---
 
-## Project Structure
+## 🔧 Updates & Bug Fixes (v2)
 
-```
+* Fixed `gm_authFailure` crash on `AdvancedMarkerElement` with a robust authentication guard.
+* Resolved designation normalization edge cases (e.g., standardizing "SR. LECTURER" vs "Senior Lecturer").
+* Pagination now correctly displays windowed page numbers, preventing overflow for large datasets.
+* Optimized count-up animations to correctly target the first text node.
+* Charts and Canvas maps now seamlessly redraw on theme toggles and section re-visits.
+
+---
+
+## 📁 Project Structure
+
+```text
 dte_dashboard/
-├── app.py                  # Flask backend
-├── requirements.txt
-├── .env                    # Google Maps API key
+├── app.py                  # Core Flask backend & API routing
+├── requirements.txt        # Python dependencies
+├── .env                    # Environment variables (API Keys)
 ├── data/
-│   └── DTE_all_Batch.xlsx
+│   └── DTE_all_Batch.xlsx  # Source dataset
 ├── templates/
-│   └── index.html
+│   └── index.html          # Main dashboard UI
 └── static/
-    ├── css/style.css
-    └── js/main.js
-    └── images/batch_images...n.jpg
+    ├── css/style.css       # Custom styling (Dark/Light themes)
+    ├── js/main.js          # Frontend logic & Chart integrations
+    └── images/             # Batch group photographs
 ```
+
+---
+
+## ©️ Copyright & Credits
+
+**Copyright © NIELIT Ropar**
+
+This dashboard was developed as part of a specialized training initiative under FutureSkills PRIME. 
+
+Created by **Lovnish Verma** (Project Engineer) and **Ravi Kant** (Project Assistant), NIELIT ROPAR, under the expert guidance of **Dr. Sarwan Singh** and **Anita Budhiraja Mam**.
