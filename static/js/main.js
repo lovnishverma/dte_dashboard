@@ -851,7 +851,14 @@ function renderTablePage() {
   tbody.innerHTML = slice.map((r, i) => `
     <tr class="row-link" onclick="openParticipantModal(${(currentPage - 1) * PAGE_SIZE + i})">
       <td>${r.sno ?? ""}</td>
-      <td><strong>${r.name ?? "—"}</strong></td>
+      <td>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div style="width:32px; height:32px; border-radius:50%; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; overflow:hidden; flex-shrink:0;">
+      <img src="${getParticipantImage(r.sno)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='${getInitials(r.name)}'">
+    </div>
+    <strong>${r.name ?? "—"}</strong>
+  </div>
+</td>
       <td>${genderPill(r.gender)}</td>
       <td>${designBadge(r.designation)}</td>
       <td>${r.branch ?? "—"}</td>
@@ -929,8 +936,16 @@ window.openParticipantModal = function (idx) {
   const modal = document.getElementById("participantModal");
   modal.style.display = "flex";
 
-  const initials = (r.name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
-  document.getElementById("modalAvatar").textContent = initials;
+  const imgPath = getParticipantImage(r.sno);
+  const initials = getInitials(r.name);
+  const avatarEl = document.getElementById("modalAvatar");
+  
+  // Inject image with an onerror fallback to initials
+  if (imgPath) {
+    avatarEl.innerHTML = `<img src="${imgPath}" alt="${r.name}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='${initials}'">`;
+  } else {
+    avatarEl.innerHTML = initials;
+  }
   document.getElementById("modalName").textContent = r.name ?? "—";
   document.getElementById("modalDesig").textContent = r.designation ?? "—";
 
@@ -996,6 +1011,34 @@ function closeLightbox() {
     modal.style.display = "none";
     img.src = ""; // Clear src to stop previous image flashing next time
   }
+}
+
+/* ── Avatar Image Helper ─────────────────────────────────────────────── */
+function getParticipantImage(sno) {
+  let num = parseInt(sno, 10);
+  if (isNaN(num)) return null;
+
+  let batch, index;
+  if (num <= 30) {
+    batch = 1;
+    index = num; // 1 to 30
+  } else if (num <= 53) {
+    batch = 2;
+    index = num - 30; // 1 to 23
+  } else {
+    batch = 3;
+    index = num - 53; // 1 to 26
+  }
+
+  // Zero-pad the index (e.g., 1 -> '01', 12 -> '12')
+  let paddedIndex = index.toString().padStart(2, '0');
+  
+  // Note: Matches your static/img folder path
+  return `/static/img/B${batch}_${paddedIndex}.png`;
+}
+
+function getInitials(name) {
+  return (name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
 }
 
 /* ══════════════════════════════════════════════════════════════════════
