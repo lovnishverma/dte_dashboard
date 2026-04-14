@@ -4,6 +4,11 @@ title: DTE Punjab — Training Dashboard v2
 sdk: docker
 colorFrom: yellow
 short_description: A full-featured Flask dashboard for the BDDS, DTE, NIELIT.
+emoji: 📈
+colorTo: indigo
+pinned: true
+thumbnail: >-
+  https://cdn-uploads.huggingface.co/production/uploads/6575c3025da75f987f12c909/F1EpaSFzebxHn1otUVgJD.jpeg
 ---
 
 <div align="center">
