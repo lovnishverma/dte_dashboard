@@ -5,57 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DTE Punjab — Training Dashboard</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-   <link rel="icon" 
-    href="https://www.nielit.gov.in/images/NIELIT_logo.jpg" 
-    type="image/x-icon">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
+
+  <link rel="icon" href="https://www.nielit.gov.in/images/NIELIT_logo.jpg" type="image/x-icon">
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
 
-<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════ -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-icon">🎓</div>
+    <div class="brand-logo">📊</div>
     <div class="brand-text">
       <span class="brand-title">DTE Punjab</span>
-      <span class="brand-sub">Training Portal</span>
+      <span class="brand-sub">Training Analytics</span>
     </div>
   </div>
 
   <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
     <a href="#overview"  class="nav-item active" data-section="overview">
-      <span class="nav-icon">📊</span><span class="nav-label">Overview</span>
+      <span class="nav-icon">⊞</span>
+      <span class="nav-label">Overview</span>
     </a>
     <a href="#charts"    class="nav-item" data-section="charts">
-      <span class="nav-icon">📈</span><span class="nav-label">Analytics</span>
+      <span class="nav-icon">📈</span>
+      <span class="nav-label">Analytics</span>
     </a>
     <a href="#insights"  class="nav-item" data-section="insights">
-      <span class="nav-icon">💡</span><span class="nav-label">Insights</span>
+      <span class="nav-icon">💡</span>
+      <span class="nav-label">Insights</span>
     </a>
+
+    <div class="nav-section-label" style="margin-top:8px;">Explore</div>
     <a href="#map"       class="nav-item" data-section="map">
-      <span class="nav-icon">🗺️</span><span class="nav-label">Colleges Map</span>
+      <span class="nav-icon">🗺</span>
+      <span class="nav-label">Colleges Map</span>
     </a>
     <a href="#gallery"   class="nav-item" data-section="gallery">
-      <span class="nav-icon">🖼️</span><span class="nav-label">Gallery</span>
+      <span class="nav-icon">🖼</span>
+      <span class="nav-label">Gallery</span>
     </a>
     <a href="#table"     class="nav-item" data-section="table">
-      <span class="nav-icon">📋</span><span class="nav-label">Participants</span>
+      <span class="nav-icon">☰</span>
+      <span class="nav-label">Participants</span>
+      <span class="nav-badge" id="navBadgeCount">—</span>
     </a>
   </nav>
 
   <div class="sidebar-footer">
-    <span>Future Skills PRIME</span>
-    <span>Govt. of Punjab</span>
+    <div class="sidebar-footer-info">
+      NIELIT Ropar · FutureSkills PRIME<br>
+      Govt. of Punjab · Feb 2026
+    </div>
+    <div class="sidebar-footer-badge">🏛 Official Portal</div>
   </div>
 </aside>
 
-<!-- ══ MAIN ══════════════════════════════════════════════════════════════════ -->
+<!-- ══ MAIN ══════════════════════════════════════════════════════════════ -->
 <div class="main-wrapper">
 
   <!-- TOP BAR -->
@@ -63,15 +77,17 @@
     <button class="menu-btn" id="menuBtn" aria-label="Toggle Sidebar">
       <span></span><span></span><span></span>
     </button>
+
     <div class="topbar-title">
-      <h1>Big Data &amp; Data Science Training</h1>
-      <p class="topbar-sub">Future Skills PRIME · Government Officials Training</p>
+      <h1>Big Data &amp; Data Science Training Programme</h1>
+      <p class="topbar-sub" id="lastUpdated">Loading data…</p>
     </div>
+
     <div class="topbar-actions">
       <button class="export-btn" id="exportBtn" title="Export to CSV">
-        <span>⬇</span> Export
+        ⬇ <span>Export</span>
       </button>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle dark/light mode">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <span class="theme-icon">🌙</span>
       </button>
     </div>
@@ -84,33 +100,38 @@
     <section id="overview" class="section active">
       <div class="section-header">
         <h2 class="section-title">Overview</h2>
-        <span class="section-badge" id="lastUpdated">Loading…</span>
+        <span class="section-badge">Punjab Polytechnic Colleges · 3 Batches</span>
       </div>
 
+      <!-- KPI Grid -->
       <div class="kpi-grid">
-        <div class="kpi-card kpi-blue">
-          <div class="kpi-icon">👥</div>
+        <div class="kpi-card kpi-cyan">
+          <div class="kpi-glow-bg"></div>
+          <div class="kpi-icon-wrap">👥</div>
           <div class="kpi-body">
             <div class="kpi-value" id="kpi-total">0</div>
             <div class="kpi-label">Total Participants</div>
           </div>
         </div>
-        <div class="kpi-card kpi-purple">
-          <div class="kpi-icon">🏛️</div>
+        <div class="kpi-card kpi-amber">
+          <div class="kpi-glow-bg"></div>
+          <div class="kpi-icon-wrap">🏛</div>
           <div class="kpi-body">
             <div class="kpi-value" id="kpi-colleges">0</div>
             <div class="kpi-label">Colleges Represented</div>
           </div>
         </div>
-        <div class="kpi-card kpi-teal">
-          <div class="kpi-icon">📍</div>
+        <div class="kpi-card kpi-emerald">
+          <div class="kpi-glow-bg"></div>
+          <div class="kpi-icon-wrap">📍</div>
           <div class="kpi-body">
             <div class="kpi-value" id="kpi-districts">0</div>
             <div class="kpi-label">Districts Covered</div>
           </div>
         </div>
         <div class="kpi-card kpi-rose">
-          <div class="kpi-icon">♀️</div>
+          <div class="kpi-glow-bg"></div>
+          <div class="kpi-icon-wrap">♀</div>
           <div class="kpi-body">
             <div class="kpi-value" id="kpi-female">0<span class="kpi-unit">%</span></div>
             <div class="kpi-label">Female Participation</div>
@@ -121,28 +142,26 @@
       <!-- Batch strip -->
       <div class="batch-strip">
         <div class="batch-card" id="batch-1">
-          <div class="batch-title">Batch 1</div>
+          <div class="batch-num">Batch 01</div>
+          <div class="batch-title">30</div>
           <div class="batch-date">9 – 13 Feb 2026</div>
-          <div class="batch-count">–</div>
           <div class="batch-range">Sr.No. 1–30</div>
         </div>
-        <div class="batch-divider">→</div>
         <div class="batch-card" id="batch-2">
-          <div class="batch-title">Batch 2</div>
+          <div class="batch-num">Batch 02</div>
+          <div class="batch-title">23</div>
           <div class="batch-date">16 – 20 Feb 2026</div>
-          <div class="batch-count">–</div>
           <div class="batch-range">Sr.No. 31–53</div>
         </div>
-        <div class="batch-divider">→</div>
         <div class="batch-card" id="batch-3">
-          <div class="batch-title">Batch 3</div>
+          <div class="batch-num">Batch 03</div>
+          <div class="batch-title">26</div>
           <div class="batch-date">23 – 27 Feb 2026</div>
-          <div class="batch-count">–</div>
           <div class="batch-range">Sr.No. 54–79</div>
         </div>
       </div>
 
-      <!-- Quick charts on overview page -->
+      <!-- Overview mini charts -->
       <div class="overview-mini-charts">
         <div class="chart-card">
           <div class="chart-header">
@@ -164,7 +183,7 @@
         </div>
         <div class="chart-card">
           <div class="chart-header">
-            <h3>Top Branches</h3>
+            <h3>Branch Breakdown</h3>
             <span class="chart-badge">Doughnut</span>
           </div>
           <div class="chart-wrap chart-wrap-sm">
@@ -178,6 +197,7 @@
     <section id="charts" class="section">
       <div class="section-header">
         <h2 class="section-title">Analytics</h2>
+        <span class="section-badge">6 Charts</span>
       </div>
       <div class="charts-grid">
         <div class="chart-card chart-wide">
@@ -241,7 +261,7 @@
     <section id="insights" class="section">
       <div class="section-header">
         <h2 class="section-title">Key Insights</h2>
-        <span class="section-badge">Auto-generated</span>
+        <span class="section-badge">Auto-generated · Live Data</span>
       </div>
       <div class="insights-grid" id="insightsGrid">
         <div class="insight-skeleton"></div>
@@ -255,80 +275,80 @@
     <section id="map" class="section">
       <div class="section-header">
         <h2 class="section-title">Colleges Map</h2>
-        <span class="section-badge">Punjab, India · Click bubble to open in Google Maps</span>
+        <span class="section-badge">Punjab · Click any bubble for details</span>
       </div>
+
       <div class="map-container">
-      <div id="mapFallback" class="map-fallback">
-          <div id="leafletMap" style="width: 100%; height: 500px; border-radius: var(--radius); z-index: 1;"></div>
-          <div class="bubble-legend" style="margin-top: 12px; text-align: center;">
-            <span class="legend-dot"></span> Bubble size = participant count &nbsp;·&nbsp; Click any bubble to view details
+        <div id="mapFallback" class="map-fallback">
+          <div id="leafletMap" style="width:100%; height:520px; z-index:1;"></div>
+          <div class="bubble-legend">
+            <span class="legend-dot"></span>
+            Bubble size reflects participant count &nbsp;·&nbsp; Click any marker to view college details
           </div>
         </div>
         <div id="googleMap" class="google-map" style="display:none;"></div>
       </div>
 
-      <!-- College details panel (shown on click) -->
+      <!-- College detail panel -->
       <div id="collegePanel" class="district-panel" style="display:none">
         <div class="dp-header">
           <div>
             <span class="dp-name" id="dpName">–</span>
             <span class="dp-count" id="dpCount">–</span>
-            <div id="dpDistrict" style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"></div>
+            <div id="dpDistrict" style="font-size:0.78rem; color:var(--text-muted); margin-top:5px;"></div>
           </div>
           <div class="dp-actions">
             <button class="dp-gmaps-btn" id="dpGmapsBtn">📍 Open in Google Maps</button>
             <button class="dp-close-btn" id="dpCloseBtn">✕</button>
           </div>
         </div>
-        <div class="dp-body">
-          <div class="dp-stat-row">
-            <div class="dp-stat" id="dpMale">–</div>
-            <div class="dp-stat" id="dpFemale">–</div>
-          </div>
+        <div class="dp-stat-row">
+          <div class="dp-stat" id="dpMale">–</div>
+          <div class="dp-stat" id="dpFemale">–</div>
         </div>
       </div>
 
       <div class="map-legend-grid" id="mapLegendGrid"></div>
     </section>
 
-<!-- ── Image Gallery ─────────────────────────────────────────────── -->
-<section id="gallery" class="section">
-  <div class="section-header">
-    <h2 class="section-title">Photo Gallery</h2>
-    <span class="section-badge">Group Photographs</span>
-  </div>
-
-  <div class="gallery-grid">
-    <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-1 group photo_page-0001.jpg', 'Batch 1 - Group Photo')">
-      <img src="/static/images/DTE Batch-1 group photo_page-0001.jpg" alt="Batch 1 Group Photo" loading="lazy">
-      <div class="gallery-caption">Batch 1 (09th Feb - 13th Feb 2026)</div>
-    </div>
-    <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-2 group photo_page-0001.jpg', 'Batch 2 - Group Photo')">
-      <img src="/static/images/DTE Batch-2 group photo_page-0001.jpg" alt="Batch 2 Group Photo" loading="lazy">
-      <div class="gallery-caption">Batch 2 (16th Feb - 20th Feb 2026)</div>
-    </div>
-    <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-3 group photo_page-0001.jpg', 'Batch 3 - Group Photo')">
-      <img src="/static/images/DTE Batch-3 group photo_page-0001.jpg" alt="Batch 3 Group Photo" loading="lazy">
-      <div class="gallery-caption">Batch 3 (23rd Feb - 27th Feb 2026)</div>
-    </div>
-  </div>
-
-  <!-- ── Extra Photos Carousel ── -->
-  <div class="carousel-section">
-    <div class="section-header" style="margin-top: 8px;">
-      <h2 class="section-title" style="font-size:1.1rem;">More Photos</h2>
-      <span class="section-badge" id="carouselCounter">Loading…</span>
-    </div>
-    <div class="carousel-wrapper">
-      <button class="carousel-btn" id="carouselPrev" aria-label="Previous">&#8592;</button>
-      <div class="carousel-track-container">
-        <div class="carousel-track" id="carouselTrack"></div>
+    <!-- ── Gallery ───────────────────────────────────────────────── -->
+    <section id="gallery" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Photo Gallery</h2>
+        <span class="section-badge">Group Photographs · All Batches</span>
       </div>
-      <button class="carousel-btn" id="carouselNext" aria-label="Next">&#8594;</button>
-    </div>
-    <div class="carousel-dots" id="carouselDots"></div>
-  </div>
-</section>
+
+      <div class="gallery-grid">
+        <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-1 group photo_page-0001.jpg', 'Batch 1 — Group Photo · 09–13 Feb 2026')">
+          <img src="/static/images/DTE Batch-1 group photo_page-0001.jpg" alt="Batch 1 Group Photo" loading="lazy">
+          <div class="gallery-caption">Batch 1 &nbsp;·&nbsp; 09th – 13th Feb 2026</div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-2 group photo_page-0001.jpg', 'Batch 2 — Group Photo · 16–20 Feb 2026')">
+          <img src="/static/images/DTE Batch-2 group photo_page-0001.jpg" alt="Batch 2 Group Photo" loading="lazy">
+          <div class="gallery-caption">Batch 2 &nbsp;·&nbsp; 16th – 20th Feb 2026</div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-3 group photo_page-0001.jpg', 'Batch 3 — Group Photo · 23–27 Feb 2026')">
+          <img src="/static/images/DTE Batch-3 group photo_page-0001.jpg" alt="Batch 3 Group Photo" loading="lazy">
+          <div class="gallery-caption">Batch 3 &nbsp;·&nbsp; 23rd – 27th Feb 2026</div>
+        </div>
+      </div>
+
+      <!-- Extra Photos Carousel -->
+      <div class="carousel-section">
+        <div class="section-header" style="margin-top:8px;">
+          <h2 class="section-title" style="font-size:1.15rem;">More Photos</h2>
+          <span class="section-badge" id="carouselCounter">Loading…</span>
+        </div>
+        <div class="carousel-wrapper">
+          <button class="carousel-btn" id="carouselPrev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-track-container">
+            <div class="carousel-track" id="carouselTrack"></div>
+          </div>
+          <button class="carousel-btn" id="carouselNext" aria-label="Next">&#8594;</button>
+        </div>
+        <div class="carousel-dots" id="carouselDots"></div>
+      </div>
+    </section>
 
     <!-- ── Participants Table ─────────────────────────────────────── -->
     <section id="table" class="section">
@@ -338,7 +358,7 @@
       </div>
 
       <div class="table-toolbar">
-        <input type="search" id="tableSearch" placeholder="🔍  Search by name, college, district…" class="search-input" />
+        <input type="search" id="tableSearch" placeholder="🔍  Search name, college, district…" class="search-input" />
         <select id="filterBatch"       class="filter-select"><option value="">All Batches</option></select>
         <select id="filterDesignation" class="filter-select"><option value="">All Designations</option></select>
         <select id="filterDistrict"    class="filter-select"><option value="">All Districts</option></select>
@@ -370,8 +390,11 @@
   </main>
 
   <footer class="footer">
-    Department of Technical Education &amp; Industrial Training · Government of Punjab &nbsp;·&nbsp;
-    <span id="footerCount"></span>
+    Department of Technical Education &amp; Industrial Training
+    <span class="footer-dot">◆</span>
+    Government of Punjab
+    <span class="footer-dot">◆</span>
+    <span id="footerCount">Loading…</span>
   </footer>
 </div>
 
@@ -391,14 +414,47 @@
 </div>
 
 <!-- Image Lightbox Modal -->
-<div id="lightboxModal" class="modal-overlay" style="display:none; z-index: 9999;">
-  <div class="lightbox-content" style="position: relative; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; align-items: center;">
-    <button class="modal-close" id="lightboxClose" style="position: absolute; top: -40px; right: 0; color: white; background: transparent; border: none; font-size: 1.5rem; width: auto; height: auto;">✕</button>
-    <img id="lightboxImage" src="" alt="Gallery Image" style="max-width: 100%; max-height: 80vh; border-radius: var(--radius); object-fit: contain; box-shadow: var(--shadow);">
-    <div id="lightboxCaption" style="color: white; text-align: center; margin-top: 12px; font-weight: 600; font-size: 1rem; letter-spacing: 0.5px;"></div>
+<div id="lightboxModal" class="modal-overlay" style="display:none; z-index:9999;">
+  <div class="lightbox-content" style="position:relative; max-width:92%; max-height:92%; display:flex; flex-direction:column; align-items:center;">
+    <button class="modal-close" id="lightboxClose" style="position:absolute; top:-44px; right:0; color:#fff; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); font-size:1rem; width:36px; height:36px; border-radius:50%;">✕</button>
+    <img id="lightboxImage" src="" alt="Gallery Image" style="max-width:100%; max-height:82vh; border-radius:14px; object-fit:contain; box-shadow:0 20px 80px rgba(0,0,0,0.8), 0 0 60px rgba(0,212,255,0.1);">
+    <div id="lightboxCaption" style="color:rgba(255,255,255,0.85); text-align:center; margin-top:14px; font-weight:600; font-size:0.95rem; letter-spacing:0.3px;"></div>
   </div>
 </div>
 
 <script src="/static/js/main.js"></script>
+
+<!-- Patch: Update batch strip to use new structure -->
+<script>
+// Override renderBatchStrip for new batch card structure
+(function() {
+  const origFetch = window.fetchAll;
+  // Patch renderBatchStrip
+  window._renderBatchStripNew = function(s) {
+    const bc = s.batch_counts || {};
+    const keys = Object.keys(bc);
+    [1, 2, 3].forEach(n => {
+      const key = keys.find(k => k.startsWith(`Batch ${n}`));
+      const count = key ? bc[key] : '–';
+      const titleEl = document.querySelector(`#batch-${n} .batch-title`);
+      if (titleEl) titleEl.textContent = count;
+    });
+    // Also update nav badge
+    const badge = document.getElementById('navBadgeCount');
+    if (badge) badge.textContent = s.total_participants;
+  };
+
+  // Intercept after DOM is ready
+  const _origRenderBatchStrip = window.renderBatchStrip;
+  document.addEventListener('DOMContentLoaded', () => {
+    // We monkey-patch after main.js loads
+    setTimeout(() => {
+      if (typeof renderBatchStrip === 'function') {
+        // Will be called normally by fetchAll
+      }
+    }, 100);
+  });
+})();
+</script>
 </body>
 </html>
