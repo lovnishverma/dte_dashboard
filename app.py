@@ -5,6 +5,7 @@ Flask backend: loads XLSX, exposes JSON API endpoints.
 
 import os
 import io
+from functools import lru_cache
 import json
 import pandas as pd
 from flask import Flask, render_template, jsonify, send_file, request
@@ -106,8 +107,10 @@ COLLEGE_COORDS = {
 }
 
 
+
 # Data Loading
 
+@lru_cache(maxsize=1)
 def load_data() -> pd.DataFrame:
     raw = pd.read_excel(DATA_FILE, sheet_name=0, header=None)
 
