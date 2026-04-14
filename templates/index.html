@@ -291,28 +291,44 @@
       <div class="map-legend-grid" id="mapLegendGrid"></div>
     </section>
 
-    <!-- ── Image Gallery ─────────────────────────────────────────── -->
-    <section id="gallery" class="section">
-      <div class="section-header">
-        <h2 class="section-title">Photo Gallery</h2>
-        <span class="section-badge">Group Photographs</span>
+<!-- ── Image Gallery ─────────────────────────────────────────────── -->
+<section id="gallery" class="section">
+  <div class="section-header">
+    <h2 class="section-title">Photo Gallery</h2>
+    <span class="section-badge">Group Photographs</span>
+  </div>
+
+  <div class="gallery-grid">
+    <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-1 group photo_page-0001.jpg', 'Batch 1 - Group Photo')">
+      <img src="/static/images/DTE Batch-1 group photo_page-0001.jpg" alt="Batch 1 Group Photo" loading="lazy">
+      <div class="gallery-caption">Batch 1 (09th Feb - 13th Feb 2026)</div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-2 group photo_page-0001.jpg', 'Batch 2 - Group Photo')">
+      <img src="/static/images/DTE Batch-2 group photo_page-0001.jpg" alt="Batch 2 Group Photo" loading="lazy">
+      <div class="gallery-caption">Batch 2 (16th Feb - 20th Feb 2026)</div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-3 group photo_page-0001.jpg', 'Batch 3 - Group Photo')">
+      <img src="/static/images/DTE Batch-3 group photo_page-0001.jpg" alt="Batch 3 Group Photo" loading="lazy">
+      <div class="gallery-caption">Batch 3 (23rd Feb - 27th Feb 2026)</div>
+    </div>
+  </div>
+
+  <!-- ── Extra Photos Carousel ── -->
+  <div class="carousel-section">
+    <div class="section-header" style="margin-top: 8px;">
+      <h2 class="section-title" style="font-size:1.1rem;">More Photos</h2>
+      <span class="section-badge" id="carouselCounter">Loading…</span>
+    </div>
+    <div class="carousel-wrapper">
+      <button class="carousel-btn" id="carouselPrev" aria-label="Previous">&#8592;</button>
+      <div class="carousel-track-container">
+        <div class="carousel-track" id="carouselTrack"></div>
       </div>
-      
-      <div class="gallery-grid">
-        <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-1 group photo_page-0001.jpg', 'Batch 1 - Group Photo')">
-          <img src="/static/images/DTE Batch-1 group photo_page-0001.jpg" alt="Batch 1 Group Photo" loading="lazy">
-          <div class="gallery-caption">Batch 1 (09th Feb - 13th Feb 2026)</div>
-        </div>
-        <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-2 group photo_page-0001.jpg', 'Batch 2 - Group Photo')">
-          <img src="/static/images/DTE Batch-2 group photo_page-0001.jpg" alt="Batch 2 Group Photo" loading="lazy">
-          <div class="gallery-caption">Batch 2 (16th Feb - 20th Feb 2026)</div>
-        </div>
-        <div class="gallery-card" onclick="openLightbox('/static/images/DTE Batch-3 group photo_page-0001.jpg', 'Batch 3 - Group Photo')">
-          <img src="/static/images/DTE Batch-3 group photo_page-0001.jpg" alt="Batch 3 Group Photo" loading="lazy">
-          <div class="gallery-caption">Batch 3 (23rd Feb - 27th Feb 2026)</div>
-        </div>
-      </div>
-    </section>
+      <button class="carousel-btn" id="carouselNext" aria-label="Next">&#8594;</button>
+    </div>
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+</section>
 
     <!-- ── Participants Table ─────────────────────────────────────── -->
     <section id="table" class="section">
