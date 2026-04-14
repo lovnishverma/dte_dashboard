@@ -13,7 +13,7 @@ short_description: A full-featured Flask dashboard for the BDDS, DTE, NIELIT.
 A comprehensive, full-featured Flask-based analytical dashboard designed for the Big Data & Data Science Training Programme conducted for the Department of Technical Education and Industrial Training (DTE), Government of Punjab.
 
 ## 🌐 Live Demo
-[Experience the Dashboard Live](https://princelv-dte.hf.space/)
+[Experience the Dashboard Live](https://nielitropar-dte.hf.space/)
 
 
 ## 🌐 GITHUB REPO:
