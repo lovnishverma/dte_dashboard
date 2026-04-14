@@ -18,7 +18,6 @@ const PAGE_SIZE = 20;
 let currentPage = 1;
 
 let selectedCollege = null;  // For map panel
-let mapBubbles = [];    // [{feature, x, y, r}] for hit-testing
 
 const charts = {};
 
@@ -491,144 +490,83 @@ function doughnutOptions() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   10. BUBBLE MAP — Clickable, opens Google Maps
+   10. BUBBLE MAP (LEAFLET FALLBACK)
 ══════════════════════════════════════════════════════════════════════ */
-const PB = { minLat: 29.5, maxLat: 32.6, minLng: 73.8, maxLng: 76.9 };
+let leafletMapInstance = null;
+let currentTileLayer = null;
 
 function renderBubbleMap(features) {
-  const canvas = document.getElementById("bubbleMapCanvas");
-  if (!canvas || !features || !features.length) return;
+  // If Google Maps loaded successfully, the fallback div is hidden. Skip Leaflet render.
+  const fallbackDiv = document.getElementById("mapFallback");
+  if (fallbackDiv && fallbackDiv.style.display === "none") return;
 
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.offsetWidth || 900;
-  const H = canvas.offsetHeight || 500;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  const ctx = canvas.getContext("2d");
-  ctx.scale(dpr, dpr);
+  const mapDiv = document.getElementById("leafletMap");
+  if (!mapDiv || !features || !features.length) return;
 
+  // Choose map style based on current theme (Dark vs Light)
   const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+  const tileUrl = isDark 
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
-  // Background
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, isDark ? "#12151f" : "#e8edfa");
-  bg.addColorStop(1, isDark ? "#1a1d27" : "#f0f4ff");
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // Grid
-  ctx.strokeStyle = isDark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.05)";
-  ctx.lineWidth = 1;
-  for (let i = 1; i < 6; i++) {
-    ctx.beginPath(); ctx.moveTo(W * i / 6, 0); ctx.lineTo(W * i / 6, H); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, H * i / 6); ctx.lineTo(W, H * i / 6); ctx.stroke();
-  }
-
-  function toXY(lat, lng) {
-    const x = ((lng - PB.minLng) / (PB.maxLng - PB.minLng)) * (W - 100) + 50;
-    const y = ((PB.maxLat - lat) / (PB.maxLat - PB.minLat)) * (H - 100) + 50;
-    return [x, y];
+  // Initialize map if it doesn't exist
+  if (!leafletMapInstance) {
+    leafletMapInstance = L.map('leafletMap').setView([31.1471, 75.3412], 7);
+    
+    currentTileLayer = L.tileLayer(tileUrl, {
+      attribution: '© <a href="https://carto.com/">CartoDB</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(leafletMapInstance);
+  } else {
+    // If theme changed, swap the tile layer dynamically
+    if (currentTileLayer._url !== tileUrl) {
+      leafletMapInstance.removeLayer(currentTileLayer);
+      currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© <a href="https://carto.com/">CartoDB</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(leafletMapInstance);
+    }
+    
+    // Clear existing markers before re-rendering
+    leafletMapInstance.eachLayer((layer) => {
+      if (layer instanceof L.CircleMarker) {
+        leafletMapInstance.removeLayer(layer);
+      }
+    });
   }
 
   const maxCount = Math.max(...features.map(f => f.count));
-  mapBubbles = [];
 
+  // Plot the bubbles
   features.forEach(f => {
-    const [x, y] = toXY(f.lat, f.lng);
-    const r = 12 + (f.count / maxCount) * 36;
     const isSelected = selectedCollege === f.college;
+    const r = 8 + (f.count / maxCount) * 16; // Scale radius based on participants
 
-    // Glow
-    const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 1.6);
-    glow.addColorStop(0, isSelected ? "rgba(45,212,191,.3)" : "rgba(79,142,247,.18)");
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.beginPath(); ctx.arc(x, y, r * 1.6, 0, Math.PI * 2);
-    ctx.fillStyle = glow; ctx.fill();
+    const circle = L.circleMarker([f.lat, f.lng], {
+      radius: r,
+      fillColor: isSelected ? "#06b6d4" : "#2563eb",
+      color: isSelected ? "#67e8f9" : "#93c5fd",
+      weight: isSelected ? 3 : 1,
+      opacity: 1,
+      fillOpacity: 0.75
+    }).addTo(leafletMapInstance);
 
-    // Bubble
-    const grad = ctx.createRadialGradient(x - r * .3, y - r * .3, 0, x, y, r);
-    if (isSelected) {
-      grad.addColorStop(0, "#67e8f9");
-      grad.addColorStop(.6, "#06b6d4");
-      grad.addColorStop(1, "#0e7490");
-    } else {
-      grad.addColorStop(0, "#6aafff");
-      grad.addColorStop(.6, "#2563eb");
-      grad.addColorStop(1, "#1e40af");
-    }
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.globalAlpha = .85;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Border
-    ctx.strokeStyle = isSelected ? "rgba(103,232,249,.8)" : "rgba(147,197,253,.5)";
-    ctx.lineWidth = isSelected ? 2.5 : 1.5;
-    ctx.stroke();
-
-    // Count
-    ctx.fillStyle = "#fff";
-    ctx.font = `bold ${Math.max(10, Math.min(r * .7, 16))}px Inter, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(f.count, x, y);
-
-    // Label
-    ctx.fillStyle = isDark ? "#c8d6ef" : "#1a1d2e";
-    ctx.font = `${isSelected ? "bold " : ""}11px Inter, sans-serif`;
-    ctx.textBaseline = "top";
-    ctx.fillText(f.college, x, y + r + 5);
-
-    mapBubbles.push({ feature: f, x, y, r });
-  });
-
-  // Title
-  ctx.fillStyle = isDark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.5)";
-  ctx.font = "bold 13px Inter, sans-serif";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-  ctx.fillText("Punjab — Participant Distribution by College  (click bubble to view details & open in Google Maps)", 14, 10);
-
-  // Attach click handler (once)
-  canvas.onclick = null;
-  canvas.onclick = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = (e.clientX - rect.left);
-    const my = (e.clientY - rect.top);
-
-    let hit = null;
-    for (const bubble of mapBubbles) {
-      const dx = mx - bubble.x;
-      const dy = my - bubble.y;
-      if (Math.sqrt(dx * dx + dy * dy) <= bubble.r + 4) {
-        hit = bubble;
-        break;
-      }
-    }
-
-    if (hit) {
-      selectedCollege = hit.feature.college;
-      renderBubbleMap(features);
-      showCollegePanel(hit.feature);
-    } else {
-      selectedCollege = null;
-      renderBubbleMap(features);
-      document.getElementById("collegePanel").style.display = "none";
-    }
-  };
-
-  // Hover cursor
-  canvas.onmousemove = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = (e.clientX - rect.left);
-    const my = (e.clientY - rect.top);
-    const isOver = mapBubbles.some(b => {
-      const dx = mx - b.x, dy = my - b.y;
-      return Math.sqrt(dx * dx + dy * dy) <= b.r + 4;
+    // Add a native Leaflet tooltip on hover
+    circle.bindTooltip(`<strong>${f.count}</strong> participants<br>${f.college}`, {
+      direction: 'top',
+      className: isDark ? 'leaflet-tooltip-dark' : ''
     });
-    canvas.style.cursor = isOver ? "pointer" : "default";
-  };
+
+    // Handle Clicks
+    circle.on('click', () => {
+      selectedCollege = f.college;
+      renderBubbleMap(features); // Re-render to highlight selected
+      showCollegePanel(f);
+      leafletMapInstance.flyTo([f.lat, f.lng], 10, { duration: 0.8 }); // Smooth zoom
+    });
+  });
 }
 
 function showCollegePanel(f) {
@@ -661,8 +599,6 @@ function showCollegePanel(f) {
 }
 
 function openGoogleMaps(lat, lng, name, district) {
-  // Omit the lat/lng centering in the URL so Google Maps 
-  // searches and opens the exact Polytechnic location rather than the district center.
   const query = `${name}, ${district || ''}, Punjab India`.replace(/, ,/g, ',');
   const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
   window.open(url, "_blank", "noopener,noreferrer");
@@ -688,20 +624,27 @@ function renderMapLegend(features) {
 }
 
 window.legendClickCollege = function (college, lat, lng) {
-  // Switch to map section, highlight, and open Google Maps
+  // Switch to map section, highlight, and open panel
   showSection("map");
   setTimeout(() => {
     const feat = mapData.features?.find(f => f.college === college);
     if (feat) {
       selectedCollege = college;
-      renderBubbleMap(mapData.features);
+      
+      // Update fallback map if active
+      const fallbackDiv = document.getElementById("mapFallback");
+      if (fallbackDiv && fallbackDiv.style.display !== "none") {
+        renderBubbleMap(mapData.features);
+        if (leafletMapInstance) leafletMapInstance.flyTo([lat, lng], 10, { duration: 1 });
+      }
+      
       showCollegePanel(feat);
     }
   }, 80);
 };
 
 /* ══════════════════════════════════════════════════════════════════════
-   12. GOOGLE MAPS (if API key present)
+   12. GOOGLE MAPS (PRIMARY)
 ══════════════════════════════════════════════════════════════════════ */
 function loadGoogleMaps(key, features) {
   let authFailed = false;
@@ -723,8 +666,9 @@ function loadGoogleMaps(key, features) {
       const { Map, InfoWindow } = await google.maps.importLibrary("maps");
       const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
       if (authFailed) return;
+      
       mapDiv.style.display = "block";
-      fallback.style.display = "none";
+      fallback.style.display = "none"; // Hides Leaflet container
 
       const map = new Map(mapDiv, { center: { lat: 31.1, lng: 75.3 }, zoom: 8, mapId: "DEMO_MAP_ID" });
       const maxCount = Math.max(...features.map(f => f.count));
@@ -747,7 +691,7 @@ function loadGoogleMaps(key, features) {
         const infoContent = `
           <div style="font-family:Inter,sans-serif;padding:12px;min-width:200px;max-width:280px">
             <strong style="font-size:14px;color:#1e293b">${f.college}</strong>
-            <div style="color:#6b7280;font-size:12px;margin:2px 0 10px">${f.district} &bull; ${f.count} participants</div>
+            <div style="color:#6b7280;font-size:12px;margin:2px 0 10px">${f.district} • ${f.count} participants</div>
             <div style="display:flex;gap:12px;margin-bottom:10px;font-size:12px;color:#374151">
               <span>👨 ${f.genders?.Male ?? 0} Male</span>
               <span>👩 ${f.genders?.Female ?? 0} Female</span>
@@ -777,7 +721,7 @@ function showCanvasFallback(features) {
   const fallback = document.getElementById("mapFallback");
   if (mapDiv) mapDiv.style.display = "none";
   if (fallback) fallback.style.display = "block";
-  if (features) renderBubbleMap(features);
+  if (features) renderBubbleMap(features); // Initialize Leaflet since GMaps failed
 }
 
 /* ══════════════════════════════════════════════════════════════════════
