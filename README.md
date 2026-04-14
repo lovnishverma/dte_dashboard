@@ -42,6 +42,8 @@ thumbnail: >-
 
 This is a production-grade full-stack web application built entirely from scratch for NIELIT Ropar to track, visualize, and analyze participant data from a government Big Data & Data Science training programme spanning 3 batches (Feb 2026) across Punjab's polytechnic colleges.
 
+This is a great example of the YAGNI (You Aren't Gonna Need It) principle in practice. Building out dynamic database schemas, admin panels, or complex configuration managers for a static dataset is a common architectural trap.
+
 ### Backend (`app.py`)
 - **Flask REST API** with 5 JSON endpoints: `/api/dashboard-data`, `/api/summary`, `/api/map-data`, `/api/stats/advanced`, `/api/export`
 - **Pandas-powered data pipeline** that reads a raw multi-header `.xlsx` file (headers at row 7, data from row 8), normalizes messy real-world inputs — de-duplicating 30+ spelling variants of college names, standardizing designations (`SR. LECTURER` → `Senior Lecturer`), and mapping branches to canonical codes (CSE, IT, CE)
