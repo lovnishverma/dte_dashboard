@@ -1022,3 +1022,116 @@ function downloadCSV(rows, filename) {
   a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   17. EXTRA PHOTOS CAROUSEL
+══════════════════════════════════════════════════════════════════════ */
+(async function initExtraCarousel() {
+  const VISIBLE   = 6;   // photos per page (desktop)
+  const BASE_PATH = "/static/extra_img/photo_";
+  let carouselPage = 0;
+  let loadedImgs   = [];
+  let totalPages   = 0;
+
+  // Probe images one by one until a 404
+  async function probeImages() {
+    const imgs = [];
+    let i = 1;
+    while (true) {
+      const src = `${BASE_PATH}${i}.jpg`;
+      const ok = await checkImage(src);
+      if (!ok) break;
+      imgs.push(src);
+      i++;
+    }
+    return imgs;
+  }
+
+  function checkImage(src) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload  = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = src;
+    });
+  }
+
+  function getVisibleCount() {
+    return window.innerWidth <= 768 ? 4 : VISIBLE;
+  }
+
+  function buildTrack(imgs) {
+    const track   = document.getElementById("carouselTrack");
+    const counter = document.getElementById("carouselCounter");
+    const dotsEl  = document.getElementById("carouselDots");
+    if (!track) return;
+
+    if (!imgs.length) {
+      track.innerHTML = `<div class="carousel-empty">No photos found in extra_img folder.</div>`;
+      if (counter) counter.textContent = "0 photos";
+      document.getElementById("carouselPrev").disabled = true;
+      document.getElementById("carouselNext").disabled = true;
+      return;
+    }
+
+    loadedImgs = imgs;
+    const vis  = getVisibleCount();
+    totalPages = Math.ceil(imgs.length / vis);
+
+    track.innerHTML = imgs.map((src, i) => `
+      <div class="carousel-item" onclick="openCarouselLightbox(${i})">
+        <img src="${src}" alt="Photo ${i + 1}" loading="lazy">
+        <div class="carousel-item-label">Photo ${i + 1}</div>
+      </div>`).join("");
+
+    if (counter) counter.textContent = `${imgs.length} photos`;
+
+    // Dots
+    dotsEl.innerHTML = Array.from({ length: totalPages }, (_, i) =>
+      `<button class="carousel-dot${i === 0 ? ' active' : ''}" data-page="${i}" aria-label="Page ${i + 1}"></button>`
+    ).join("");
+    dotsEl.querySelectorAll(".carousel-dot").forEach(dot => {
+      dot.addEventListener("click", () => goToPage(+dot.dataset.page));
+    });
+
+    document.getElementById("carouselPrev").addEventListener("click", () => goToPage(carouselPage - 1));
+    document.getElementById("carouselNext").addEventListener("click", () => goToPage(carouselPage + 1));
+
+    updateCarousel();
+  }
+
+  function goToPage(page) {
+    const vis = getVisibleCount();
+    totalPages = Math.ceil(loadedImgs.length / vis);
+    carouselPage = Math.max(0, Math.min(page, totalPages - 1));
+    updateCarousel();
+  }
+
+  function updateCarousel() {
+    const track = document.getElementById("carouselTrack");
+    const items = track?.querySelectorAll(".carousel-item");
+    if (!items?.length) return;
+
+    const vis      = getVisibleCount();
+    const itemW    = items[0].offsetWidth + 14;
+    const offset   = carouselPage * vis * itemW;
+    track.style.transform = `translateX(-${offset}px)`;
+
+    document.querySelectorAll(".carousel-dot").forEach((d, i) =>
+      d.classList.toggle("active", i === carouselPage)
+    );
+    document.getElementById("carouselPrev").disabled = carouselPage === 0;
+    document.getElementById("carouselNext").disabled = carouselPage >= totalPages - 1;
+  }
+
+  // Open in existing lightbox
+  window.openCarouselLightbox = function(idx) {
+    openLightbox(loadedImgs[idx], `Photo ${idx + 1}`);
+  };
+
+  window.addEventListener("resize", () => goToPage(0));
+
+  // Kick off
+  const imgs = await probeImages();
+  buildTrack(imgs);
+})();
