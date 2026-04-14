@@ -412,6 +412,107 @@ body {
   background: var(--surface);
 }
 
+/* ── Participant Photo Carousel ──────────────────────────────────────── */
+.carousel-section {
+  margin-top: 24px;
+}
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  box-shadow: var(--shadow-card);
+}
+.carousel-track-container {
+  flex: 1;
+  overflow: hidden;
+}
+.carousel-track {
+  display: flex;
+  gap: 14px;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.carousel-item {
+  flex-shrink: 0;
+  width: 130px;
+  cursor: pointer;
+  text-align: center;
+}
+.carousel-item img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  border: 3px solid var(--border);
+  transition: border-color 0.2s, transform 0.2s;
+  display: block;
+  margin: 0 auto 8px;
+  background: var(--surface-2);
+}
+.carousel-item:hover img {
+  border-color: var(--accent-blue);
+  transform: scale(1.06);
+}
+.carousel-item-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.carousel-btn {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  font-family: var(--font);
+}
+.carousel-btn:hover { background: var(--badge-bg); border-color: var(--accent-blue); }
+.carousel-btn:disabled { opacity: 0.35; cursor: default; }
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  padding: 0;
+}
+.carousel-dot.active {
+  background: var(--accent-blue);
+  transform: scale(1.3);
+}
+.carousel-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 24px;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .carousel-item { width: 100px; }
+  .carousel-item img { width: 80px; height: 80px; }
+}
 
 /* ── Table ───────────────────────────────────────────────────────────── */
 .table-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
